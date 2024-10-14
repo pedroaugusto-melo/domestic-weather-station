@@ -1,6 +1,6 @@
 from typing import Any
 
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 
 from app.core.security import get_password_hash, verify_password
 from app.models.user import User, UserCreate, UserUpdate
@@ -34,6 +34,28 @@ def get_user_by_email(*, session: Session, email: str) -> User | None:
     statement = select(User).where(User.email == email)
     session_user = session.exec(statement).first()
     return session_user
+
+
+def get_user_by_id(*, session: Session, user_id: int) -> User | None:
+    return session.get(User, user_id)
+
+
+def count_users(*, session: Session) -> int:
+    statement = select(func.count()).select_from(User)
+    count = session.exec(statement).one()
+    return count
+
+
+def get_users(*, session: Session, skip: int = 0, limit: int = 100) -> list[User]:
+    statement = select(User).offset(skip).limit(limit)
+    users = session.exec(statement).all()
+    return users
+
+
+def delele_user(*, session: Session, user: User) -> User:
+    session.delete(user)
+    session.commit()
+    return user
 
 
 def authenticate(*, session: Session, email: str, password: str) -> User | None:
