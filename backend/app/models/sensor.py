@@ -16,11 +16,11 @@ class SensorCreate(SensorBase):
 
 # Properties to receive via API on update, all are optional
 class SensorUpdate(SensorBase):
-    manufacturer: str | None
-    component_reference: str | None
-    datasheet_url: str | None
-    measuremnts_types: list[str] | None
-    part_number: str | None
+    manufacturer: str | None = None
+    component_reference: str | None = None
+    datasheet_url: str | None = None
+    measuremnts_types: list[str] | None = None
+    part_number: str | None = None
 
 
 # Database model

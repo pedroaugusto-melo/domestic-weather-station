@@ -3,7 +3,7 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.api.deps import CurrentUser, SessionDep
+from app.api.deps import CurrentUser, SessionDep, get_current_user
 
 from app.models.sensor import SensorCreate, SensorUpdate, SensorPublic
 from app.models.message import Message
@@ -14,7 +14,7 @@ import app.crud.sensor as crud
 router = APIRouter()
 
 
-@router.get("/{id}", response_model=SensorPublic, dependencies=[Depends(CurrentUser)])
+@router.get("/{id}", response_model=SensorPublic, dependencies=[Depends(get_current_user)])
 def read_sensor(session: SessionDep, id: uuid.UUID) -> Any:
     """
     Get sensor by ID.
@@ -57,12 +57,12 @@ def update_sensor(
     if not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Not enough permissions")
 
-    sensor = crud.get_sensor_by_id(session=session, item_id=id)
+    sensor = crud.get_sensor_by_id(session=session, sensor_id=id)
     
     if not sensor:
         raise HTTPException(status_code=404, detail="Sensor not found")
     
-    update_sensor = crud.update_sensor(session=session, db_sensor=sensor_in, item_in=sensor_in)
+    update_sensor = crud.update_sensor(session=session, db_sensor=sensor, sensor_in=sensor_in)
     return update_sensor
 
 
@@ -77,7 +77,7 @@ def delete_sensor(
     if not current_user.is_superuser:
         raise HTTPException(status_code=400, detail="Not enough permissions")
 
-    sensor = crud.get_sensor_by_id(session=session, item_id=id)
+    sensor = crud.get_sensor_by_id(session=session, sensor_id=id)
     
     if not sensor:
         raise HTTPException(status_code=404, detail="Sensor not found")
