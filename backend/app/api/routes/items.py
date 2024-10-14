@@ -21,6 +21,7 @@ def read_items(
     """
     Retrieve items.
     """
+
     count = crud.count_items(session=session, owner_id=current_user.id)
     items = crud.get_items(session=session, owner_id=current_user.id, skip=skip, limit=limit)
 
@@ -32,6 +33,7 @@ def read_item(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> 
     """
     Get item by ID.
     """
+
     item = crud.get_item_by_id(session, item_id=id)
 
     if not item:
@@ -49,6 +51,7 @@ def create_item(
     """
     Create new item.
     """
+
     item = crud.create_item(session=session, item_in=item_in, owner_id=current_user.id)
     return item
 
@@ -64,6 +67,7 @@ def update_item(
     """
     Update an item.
     """
+
     item = crud.get_item_by_id(session=session, item_id=id)
     
     if not item:
@@ -82,6 +86,7 @@ def delete_item(
     """
     Delete an item.
     """
+    
     item = crud.get_item_by_id(session=session, item_id=id)
     
     if not item:
