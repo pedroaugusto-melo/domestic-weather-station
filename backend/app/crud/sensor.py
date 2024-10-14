@@ -4,8 +4,8 @@ from sqlmodel import Session, select
 from app.models.sensor import Sensor, SensorCreate, SensorUpdate
 
 
-def create_sensor(*, session: Session, sensor_create: SensorCreate) -> Sensor:
-    db_obj = Sensor.model_validate(sensor_create)
+def create_sensor(*, session: Session, sensor_in: SensorCreate) -> Sensor:
+    db_obj = Sensor.model_validate(sensor_in)
     session.add(db_obj)
     session.commit()
     session.refresh(db_obj)
@@ -29,3 +29,9 @@ def get_sensor_by_part_number(*, session: Session, part_number: str) -> Sensor |
     statement = select(Sensor).where(Sensor.part_number == part_number)
     session_sensor = session.exec(statement).first()
     return session_sensor
+
+
+def delete_sensor(*, session: Session, sensor: Sensor) -> Sensor:
+    session.delete(sensor)
+    session.commit()
+    return sensor

@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.api.deps import CurrentUser, SessionDep
 
-from app.models.item import Item, ItemCreate, ItemPublic, ItemsPublic, ItemUpdate
+from app.models.item import ItemCreate, ItemPublic, ItemsPublic, ItemUpdate
 from app.models.message import Message
 
 import app.crud.item as crud
@@ -32,7 +32,7 @@ def read_item(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> 
     """
     Get item by ID.
     """
-    item = session.get(Item, id)
+    item = crud.get_item_by_id(session, item_id=id)
 
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
