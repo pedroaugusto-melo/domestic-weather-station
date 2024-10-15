@@ -30,7 +30,7 @@ class Sensor(SensorBase, table=True):
 
     # Relationships
     temperature_readings: list["TemperatureReading"] = Relationship(back_populates="sensor") # type: ignore
-
+    weather_station_models: list["WeatherStationModelSensor"] = Relationship(back_populates="sensor") # type: ignore
 
 # Properties to return via API
 class SensorPublic(SensorBase):
