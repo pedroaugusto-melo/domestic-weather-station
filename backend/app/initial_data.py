@@ -4,6 +4,8 @@ from sqlmodel import Session
 
 from app.core.db import engine, init_db
 
+from app.models import user, weather_station, temperature_reading
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

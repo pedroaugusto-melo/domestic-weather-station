@@ -36,6 +36,7 @@ def init_db(session: Session) -> None:
         email=settings.FIRST_SUPERUSER,
         password=settings.FIRST_SUPERUSER_PASSWORD,
         is_superuser=True,
+        full_name="DWS Admin"
     )
     crud_user.create_user(session=session, user_create=user_in)
     
@@ -54,22 +55,22 @@ def init_db(session: Session) -> None:
         manufacturer="Aosong Electronics",
         component_reference="DHT22",
         datasheet_url="https://www.sparkfun.com/datasheets/Sensors/Temperature/DHT22.pdf",
-        description="Sensor de temperatura e umidade",
         part_number="1",
+        measuremnts_types=["temperature", "humidity"],
     )
     mq135_in = SensorCreate(
         manufacturer="Winsen",
         component_reference="MQ135",
         datasheet_url="https://www.winsen-sensor.com/d/files/PDF/Semiconductor%20Gas%20Sensor/MQ135%20(Ver1.4)%20-%20Manual.pdf",
-        description="Sensor de gases tóxicos",
-        part_number="1",
+        part_number="2",
+        measuremnts_types=["gas_level"],
     )
     dht22 = crud_sensor.create_sensor(session=session, sensor_in=dht22_in)
     mq135 = crud_sensor.create_sensor(session=session, sensor_in=mq135_in)
 
     # create weather station model
     weather_station_in = WeatherStationModelCreate(
-        weather_station_model_id=microcontroller.id,
+        microcontroller_id=microcontroller.id,
         name="Estação Meteorológica v1",
         description="Estação meteorológica com ESP32, DHT22 e MQ135",
         release_date="2024-10-09",
@@ -85,5 +86,5 @@ def init_db(session: Session) -> None:
         weather_station_model_id=weather_station.id,
         sensor_id=mq135.id,
     )
-    crud_weather_station_model_sensor.create_weather_station_model_sensor(session=session, weather_station_model_sensor_in=weather_station_model_sensor_dht22)
-    crud_weather_station_model_sensor.create_weather_station_model_sensor(session=session, weather_station_model_sensor_in=weather_station_model_sensor_mq135)
+    crud_weather_station_model_sensor.create_weather_station_model_sensor(session=session, wsms_in=weather_station_model_sensor_dht22)
+    crud_weather_station_model_sensor.create_weather_station_model_sensor(session=session, wsms_in=weather_station_model_sensor_mq135)
