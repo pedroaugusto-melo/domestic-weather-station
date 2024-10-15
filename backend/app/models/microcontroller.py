@@ -1,5 +1,5 @@
 import uuid
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 
 # Shared properties
 class MicrocontrollerBase(SQLModel):
@@ -24,6 +24,7 @@ class MicrocontrollerUpdate(MicrocontrollerBase):
 # Database model
 class Microcontroller(MicrocontrollerBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    weather_station_models: list["WeatherStationModel"] = Relationship(back_populates="microcontroller") # type: ignore
 
 # Properties to return via API
 class MicrocontrollerPublic(MicrocontrollerBase):
