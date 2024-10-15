@@ -1,5 +1,5 @@
 import uuid
-from sqlmodel import SQLModel, Field, Column, ARRAY, String
+from sqlmodel import SQLModel, Field, Column, ARRAY, String, Relationship
 
 # Shared properties
 class SensorBase(SQLModel):
@@ -27,6 +27,9 @@ class SensorUpdate(SensorBase):
 class Sensor(SensorBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     measuremnts_types: list[str] = Field(sa_column=Column(ARRAY(String)))
+
+    # Relationships
+    temperature_readings: list["TemperatureReading"] = Relationship(back_populates="sensor") # type: ignore
 
 
 # Properties to return via API
