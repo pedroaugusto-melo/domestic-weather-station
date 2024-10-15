@@ -38,7 +38,10 @@ class UpdatePassword(SQLModel):
 class User(UserBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     hashed_password: str
+
+    # Relationships
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True) # type: ignore
+    weather_stations: list["WeatherStation"] = Relationship(back_populates="user", cascade_delete=True) # type: ignore
 
 
 # Properties to return via API, id is always required

@@ -4,6 +4,7 @@ from sqlmodel import SQLModel, Field, Relationship
 
 from app.models.microcontroller import Microcontroller
 
+
 # Shared properties
 class WeatherStationModelBase(SQLModel):
     microcontroller_id: uuid.UUID = Field(foreign_key="microcontroller.id")
@@ -25,7 +26,10 @@ class WeatherStationModelUpdate(SQLModel):
 # Database model
 class WeatherStationModel(WeatherStationModelBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
+    # Relationships
     microcontroller: Microcontroller = Relationship(back_populates="weather_station_models")
+    weather_stations: list["WeatherStation"] = Relationship(back_populates="weather_station_model") # type: ignore
 
     __tablename__ = "weather_station_model"
 

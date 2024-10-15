@@ -30,6 +30,7 @@ from app.models.item import Item # noqa
 from app.models.sensor import Sensor # noqa
 from app.models.microcontroller import Microcontroller # noqa
 from app.models.weather_station_model import WeatherStationModel # noqa
+from app.models.weather_station import WeatherStation # noqa
 
 target_metadata = SQLModel.metadata
 
