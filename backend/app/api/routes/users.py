@@ -4,11 +4,11 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 
 import app.crud.user as crud
-from app.api.deps import (
+from app.api.deps.user import (
     CurrentUser,
-    SessionDep,
     get_current_active_superuser,
 )
+from app.api.deps.db import SessionDep
 from app.core.config import settings
 from app.core.security import verify_password
 from app.models.user import UserCreate, UserPublic, UserRegister, UsersPublic, UserUpdate, UpdatePassword

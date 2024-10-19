@@ -3,7 +3,8 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.api.deps import CurrentUser, SessionDep, get_current_user
+from app.api.deps.user import CurrentUser, get_current_user
+from app.api.deps.db import SessionDep
 
 from app.models.weather_station import (
     WeatherStationCreate,
