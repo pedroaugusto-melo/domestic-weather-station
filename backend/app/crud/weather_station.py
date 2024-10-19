@@ -1,5 +1,5 @@
 import uuid
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.models.weather_station import (
     WeatherStation,
@@ -33,6 +33,14 @@ def get_weather_station_by_id(
     *, session: Session, weather_station_id: uuid.UUID
 ) -> WeatherStation | None:
     return session.get(WeatherStation, weather_station_id)
+
+
+def get_weather_station_by_part_number(
+    *, session: Session, part_number: str
+) -> WeatherStation | None:
+    statement = select(WeatherStation).where(WeatherStation.part_number == part_number)
+    weather_station = session.exec(statement).first()
+    return weather_station
 
 
 def delete_weather_station(

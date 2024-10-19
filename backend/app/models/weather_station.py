@@ -10,6 +10,7 @@ class WeatherStationBase(SQLModel):
     user_id: uuid.UUID = Field(foreign_key="user.id")
     weather_station_model_id: uuid.UUID = Field(foreign_key="weather_station_model.id")
     name: str
+    part_number: str = Field(unique=True, index=True)
     description: Optional[str] = None
 
 # Properties to receive via API on creation
@@ -21,6 +22,7 @@ class WeatherStationUpdate(SQLModel):
     user_id: Optional[uuid.UUID] = None
     weather_station_model_id: Optional[uuid.UUID] = None
     name: Optional[str] = None
+    part_number: Optional[str] = None
     description: Optional[str] = None
 
 # Database model

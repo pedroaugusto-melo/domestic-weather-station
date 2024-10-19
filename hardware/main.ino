@@ -1,11 +1,17 @@
-#include "DHT.h"
+#include <NTPClient.h>
 #include <WiFi.h>
+#include <WiFiUdp.h>
 #include <PubSubClient.h>
+#include "DHT.h"
 
 #define TEMP_HUM_PIN 32
 #define GAS_PIN 34  
 
 #define DHT_TYPE DHT22
+
+#define DHT22_SENSOR_PART_NUMBER 1
+#define MQ135_SENSOR_PART_NUMBER 2
+#define STATION_PART_NUMBER 1
 
 #define SSID ""
 #define SSID_PASSWORD ""
@@ -20,6 +26,9 @@ DHT dht(TEMP_HUM_PIN, DHT_TYPE);
 
 WiFiClient espClient;
 PubSubClient client(espClient);
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
 
 float temperature;
 float humidity;
@@ -49,6 +58,14 @@ void setupWiFi() {
   Serial.print("\n");
   Serial.print("Connected to ");
   Serial.println(SSID);
+}
+
+void setupWiFiUDP() {
+  timeClient.begin();
+
+  while(!timeClient.update()){
+    timeClient.forceUpdate();
+  }
 }
 
 void reconnectMQTT() {
@@ -101,40 +118,57 @@ void readGasData() {
   Serial.println(gasLevel);
 }
 
-void publishTempData() {
-  String payload = "{";
-  payload += "\"temperature\":";
-  payload += temperature;
-  payload += "}";
+char* getCurrentTimeString(){
+  time_t now = timeClient.getEpochTime();
+  struct tm* timeInfo = localtime(&now);
+  static char timeString[25];
+  strftime(timeString, sizeof(timeString), "%Y-%m-%dT%H:%M:%SZ", timeInfo);
 
-  client.publish("temperature/domestic_weather_station", payload.c_str());
+  return timeString;
+}
+
+const char* getPublishPayload(String measurementType, float measurementValue, int sensorPartNumber) {
+  char* currentTimeString = getCurrentTimeString();
+
+  String payload = "{";
+  payload += "\"";
+  payload += measurementType;
+  payload += "\":";
+  payload += measurementValue;
+  payload += ",";
+  payload += "\"read_at\":\"";
+  payload += String(currentTimeString);
+  payload += "\",";
+  payload += "\"sensor_part_number\":\"";
+  payload += sensorPartNumber;
+  payload += "\",";
+  payload += "\"station_part_number\":\"";
+  payload += STATION_PART_NUMBER;
+  payload += "\"}";
+
+  static String staticPayload;
+  staticPayload = payload;
+  return staticPayload.c_str();
+}
+
+void publishTempData() {
+  const char* payload = getPublishPayload("temperature", temperature, DHT22_SENSOR_PART_NUMBER);
+  client.publish("temperature/domestic_weather_station", payload);
 }
 
 void publishHumidityData() {
-  String payload = "{";
-  payload += "\"humidity\":";
-  payload += humidity;
-  payload += "}";
-
-  client.publish("humidity/domestic_weather_station", payload.c_str());
+  const char* payload = getPublishPayload("humidity", humidity, DHT22_SENSOR_PART_NUMBER);
+  client.publish("humidity/domestic_weather_station", payload);
 }
 
 void publishHeatIndexData() {
-  String payload = "{";
-  payload += "\"heat_index\":";
-  payload += heatIndex;
-  payload += "}";
-
-  client.publish("heat_index/domestic_weather_station", payload.c_str());
+  const char* payload = getPublishPayload("heat_index", heatIndex, DHT22_SENSOR_PART_NUMBER);
+  client.publish("heat_index/domestic_weather_station", payload);
 }
 
 void publishGasLevelData() {
-  String payload = "{";
-  payload += "\"gas_level\":";
-  payload += gasLevel;
-  payload += "}";
-
-  client.publish("gas_level/domestic_weather_station", payload.c_str());
+  const char* payload = getPublishPayload("gas_level", gasLevel, MQ135_SENSOR_PART_NUMBER);
+  client.publish("gas_level/domestic_weather_station", payload);
 }
 
 // --------------------------------------------------------------------
@@ -144,6 +178,7 @@ void setup() {
   Serial.println("Initializing system...");
   
   setupWiFi();
+  setupWiFiUDP();
   setupESPClient();
   dht.begin();
   
@@ -155,13 +190,14 @@ void loop() {
   connectMQTT();
 
   readTempHumData();
-  readGasData();
-
   publishTempData();
   publishHumidityData();
   publishHeatIndexData();
+  Serial.println("(DHT22 data published)");
+
+  readGasData();
   publishGasLevelData();
-  Serial.println("(Data published)");
+  Serial.println("(MQ135 data published)");
 
   Serial.print("\n");
   

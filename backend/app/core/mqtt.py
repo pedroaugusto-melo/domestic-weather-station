@@ -1,8 +1,16 @@
 import paho.mqtt.client as mqtt
 from enum import StrEnum
+from sqlmodel import Session
 import json
 
 from app.core.config import settings
+from app.core.db import engine
+
+import app.crud.sensor as sensor_crud
+import app.crud.weather_station as weather_station_crud
+
+import app.crud.temperature_reading as temperature_reading_crud
+from app.models.temperature_reading import TemperatureReadingCreate
 
 class MQTTTopics(StrEnum):
     TEMPERATURE = "temperature/domestic_weather_station"
@@ -12,20 +20,26 @@ class MQTTTopics(StrEnum):
 
 
 def on_mqtt_message(client, userdata, msg):
-    # print(f"Mensagem recebida no tópico {msg.topic}: {msg.payload.decode()}")
-    
-    # data = json.loads(msg.payload.decode())
+    data = json.loads(msg.payload.decode())
 
-    # if msg.topic == MQTTTopics.TEMPERATURE:
-    #     print(f"Temperatura recebida: {data['temperature']}")
-    # elif msg.topic == MQTTTopics.HUMIDITY:
-    #     print(f"Umidade recebida: {data['humidity']}")
-    # elif msg.topic == MQTTTopics.HEAT_INDEX:
-    #     print(f"Índice de calor recebido: {data['heat_index']}")
-    # elif msg.topic == MQTTTopics.GAS_LEVEL:
-    #     print(f"Nível de gás recebido: {data['gas_level']}")
+    if msg.topic == MQTTTopics.TEMPERATURE:
+        with Session(engine) as session:
+            sensor_part_number = data['sensor_part_number']
+            sensor = sensor_crud.get_sensor_by_part_number(session=session, part_number=sensor_part_number)
+            
+            weather_station_part_number = data['station_part_number']
+            weather_station = weather_station_crud.get_weather_station_by_part_number(session=session, part_number=weather_station_part_number)
+
+            temperature_reading = TemperatureReadingCreate(
+                sensor_id=sensor.id,
+                weather_station_id=weather_station.id,
+                value=data['temperature'],
+                read_at=data['read_at']
+            )
+            temperature_reading_crud.create_temperature_reading(session=session, temperature_reading_in=temperature_reading)
+        
     
-    # print("\n")
+
     pass
 
 def setup_mqtt_client():

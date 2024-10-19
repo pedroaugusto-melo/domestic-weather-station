@@ -7,30 +7,19 @@ from app.models.microcontroller import MicrocontrollerCreate
 from app.models.sensor import SensorCreate
 from app.models.weather_station_model import WeatherStationModelCreate
 from app.models.weather_station_model_sensor import WeatherStationModelSensorCreate
+from app.models.weather_station import WeatherStationCreate
 
 import app.crud.user as crud_user
 import app.crud.microcontroller as crud_microcontroller
 import app.crud.sensor as crud_sensor
 import app.crud.weather_station_model as crud_weather_station_model
 import app.crud.weather_station_model_sensor as crud_weather_station_model_sensor
+import app.crud.weather_station as crud_weather_station
 
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 
-# make sure all SQLModel models are imported (app.models) before initializing DB
-# otherwise, SQLModel might fail to initialize relationships properly
-# for more details: https://github.com/fastapi/full-stack-fastapi-template/issues/28
-
-
 def init_db(session: Session) -> None:
-    # Tables should be created with Alembic migrations
-    # But if you don't want to use migrations, create
-    # the tables un-commenting the next lines
-    # from sqlmodel import SQLModel
-
-    # This works because the models are already imported and registered from app.models
-    # SQLModel.metadata.create_all(engine)
-
     # create the first superuser
     user_in = UserCreate(
         email=settings.FIRST_SUPERUSER,
@@ -38,7 +27,7 @@ def init_db(session: Session) -> None:
         is_superuser=True,
         full_name="DWS Admin"
     )
-    crud_user.create_user(session=session, user_create=user_in)
+    user = crud_user.create_user(session=session, user_create=user_in)
     
     # create microcontroller
     microcontroller_in = MicrocontrollerCreate(
@@ -69,22 +58,32 @@ def init_db(session: Session) -> None:
     mq135 = crud_sensor.create_sensor(session=session, sensor_in=mq135_in)
 
     # create weather station model
-    weather_station_in = WeatherStationModelCreate(
+    weather_station_model_in = WeatherStationModelCreate(
         microcontroller_id=microcontroller.id,
         name="Estação Meteorológica v1",
         description="Estação meteorológica com ESP32, DHT22 e MQ135",
         release_date="2024-10-09",
     )
-    weather_station = crud_weather_station_model.create_weather_station_model(session=session, weather_station_model_in=weather_station_in)
+    weather_station_model = crud_weather_station_model.create_weather_station_model(session=session, weather_station_model_in=weather_station_model_in)
 
     # create weather station model sensors
     weather_station_model_sensor_dht22 = WeatherStationModelSensorCreate(
-        weather_station_model_id=weather_station.id,
+        weather_station_model_id=weather_station_model.id,
         sensor_id=dht22.id,
     )
     weather_station_model_sensor_mq135 = WeatherStationModelSensorCreate(
-        weather_station_model_id=weather_station.id,
+        weather_station_model_id=weather_station_model.id,
         sensor_id=mq135.id,
     )
     crud_weather_station_model_sensor.create_weather_station_model_sensor(session=session, wsms_in=weather_station_model_sensor_dht22)
     crud_weather_station_model_sensor.create_weather_station_model_sensor(session=session, wsms_in=weather_station_model_sensor_mq135)
+
+    # create weather station
+    weather_station_in = WeatherStationCreate(
+        user_id=user.id,
+        weather_station_model_id=weather_station_model.id,
+        part_number="1",
+        name="Estação Meteorológica 1",
+        description="Primeira estação meteorológica do projeto",
+    )
+    crud_weather_station.create_weather_station(session=session, weather_station_in=weather_station_in)
