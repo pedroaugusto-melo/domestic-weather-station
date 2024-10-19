@@ -53,12 +53,12 @@ def update_sensor(
     Update an sensor.
     """
 
-    update_sensor = service.update_sensor(session=session, id=id, sensor_in=sensor_in)
+    updated_sensor = service.update_sensor(session=session, id=id, sensor_in=sensor_in)
     
-    if update_sensor is None:
+    if updated_sensor is None:
         raise HTTPException(status_code=404, detail="Sensor not found")
     
-    return update_sensor
+    return updated_sensor
 
 
 @router.delete("/{id}", response_model=Message, dependencies=[Depends(deps.authorize_delete_sensor)])

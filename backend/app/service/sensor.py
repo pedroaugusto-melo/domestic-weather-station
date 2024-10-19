@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlmodel import Session
 import uuid
 
 from app.models.sensor import Sensor, SensorCreate, SensorUpdate

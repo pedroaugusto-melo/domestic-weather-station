@@ -3,8 +3,9 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.api.deps.user import CurrentUser, get_current_user
+from app.api.deps.user import get_current_user
 from app.api.deps.db import SessionDep
+import app.api.deps.microcontroller as deps
 
 from app.models.microcontroller import (
     MicrocontrollerCreate,
@@ -13,7 +14,7 @@ from app.models.microcontroller import (
 )
 from app.models.message import Message
 
-import app.crud.microcontroller as crud
+import app.service.microcontroller as service
 
 
 router = APIRouter()
@@ -25,7 +26,7 @@ def read_microcontroller(session: SessionDep, id: uuid.UUID) -> Any:
     Get microcontroller by ID.
     """
 
-    microcontroller = crud.get_microcontroller_by_id(session=session, microcontroller_id=id)
+    microcontroller = service.get_microcontroller_by_id(session=session, microcontroller_id=id)
 
     if not microcontroller:
         raise HTTPException(status_code=404, detail="Microcontroller not found")
@@ -33,64 +34,48 @@ def read_microcontroller(session: SessionDep, id: uuid.UUID) -> Any:
     return microcontroller
 
 
-@router.post("/", response_model=MicrocontrollerPublic)
+@router.post("/", response_model=MicrocontrollerPublic, dependencies=[Depends(deps.authorize_create_microcontroller)])
 def create_microcontroller(
-    *, session: SessionDep, current_user: CurrentUser, microcontroller_in: MicrocontrollerCreate
+    *, session: SessionDep, microcontroller_in: MicrocontrollerCreate
 ) -> Any:
     """
     Create new microcontroller.
     """
-
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     
-    microcontroller = crud.create_microcontroller(session=session, microcontroller_in=microcontroller_in)
+    microcontroller = service.create_microcontroller(session=session, microcontroller_in=microcontroller_in)
     return microcontroller
 
 
-@router.put("/{id}", response_model=MicrocontrollerPublic)
+@router.put("/{id}", response_model=MicrocontrollerPublic, dependencies=[Depends(deps.authorize_update_microcontroller)])
 def update_microcontroller(
     *,
     session: SessionDep,
-    current_user: CurrentUser,
     id: uuid.UUID,
     microcontroller_in: MicrocontrollerUpdate,
 ) -> Any:
     """
     Update a microcontroller.
     """
-
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     
-    microcontroller = crud.get_microcontroller_by_id(session=session, microcontroller_id=id)
+    updated_microcontroller = service.update_microcontroller(id=id, session=session, microcontroller_in=microcontroller_in)
     
-    if not microcontroller:
+    if not updated_microcontroller:
         raise HTTPException(status_code=404, detail="Microcontroller not found")
     
-    updated_microcontroller = crud.update_microcontroller(
-        session=session,
-        db_microcontroller=microcontroller,
-        microcontroller_in=microcontroller_in,
-    )
     return updated_microcontroller
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", response_model=Message, dependencies=[Depends(deps.authorize_delete_microcontroller)])
 def delete_microcontroller(
-    *, session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+    *, session: SessionDep, id: uuid.UUID
 ) -> Message:
     """
     Delete a microcontroller.
     """
-
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     
-    microcontroller = crud.get_microcontroller_by_id(session=session, microcontroller_id=id)
+    deleted_microcontroller = service.delete_microcontroller(session=session, id=id)
     
-    if not microcontroller:
+    if not deleted_microcontroller:
         raise HTTPException(status_code=404, detail="Microcontroller not found")
     
-    crud.delete_microcontroller(session=session, microcontroller=microcontroller)
     return Message(message="Microcontroller deleted successfully")
