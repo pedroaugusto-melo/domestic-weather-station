@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 
 from app.api.main import api_router
 from app.core.config import settings
-from app.core.mqtt import setup_mqtt_client
+from app.service.mqtt import setup_mqtt_client
 
 def custom_generate_unique_id(route: APIRoute) -> str:
     return f"{route.tags[0]}-{route.name}"
