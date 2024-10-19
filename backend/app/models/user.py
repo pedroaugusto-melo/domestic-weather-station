@@ -40,7 +40,6 @@ class User(UserBase, table=True):
     hashed_password: str
 
     # Relationships
-    items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True) # type: ignore
     weather_stations: list["WeatherStation"] = Relationship(back_populates="user", cascade_delete=True) # type: ignore
 
 

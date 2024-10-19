@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 
 from app.api.routes import (
-    items, 
     login, 
     users, 
     utils, 
@@ -23,5 +22,3 @@ api_router.include_router(weather_stations.router, prefix="/weather_stations", t
 api_router.include_router(weather_station_models_sensors.router, prefix="/weather_station_models_sensors", tags=["weather_station_models_sensors"])
 api_router.include_router(temperature_readings.router, prefix="/temperature_readings", tags=["temperature_readings"])
 api_router.include_router(utils.router, prefix="/utils", tags=["utils"])
-
-api_router.include_router(items.router, prefix="/items", tags=["items"])
