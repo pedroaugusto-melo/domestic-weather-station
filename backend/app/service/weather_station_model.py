@@ -7,7 +7,7 @@ import app.crud.weather_station_model as crud
 import app.service.microcontroller as microcontroller_service
 
 
-def get_weather_station_model_by_id(session: Session, id: uuid.UUID) -> WeatherStationModel:
+def get_weather_station_model_by_id(session: Session, id: uuid.UUID) -> WeatherStationModel | None:
     return crud.get_weather_station_model_by_id(session=session, weather_station_model_id=id)
 
 
