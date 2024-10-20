@@ -3,8 +3,9 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.api.deps.user import CurrentUser, get_current_user
+from app.api.deps.user import get_current_user
 from app.api.deps.db import SessionDep
+import app.api.deps.weather_station_model as deps
 
 from app.models.weather_station_model import (
     WeatherStationModelCreate,
@@ -13,7 +14,7 @@ from app.models.weather_station_model import (
 )
 from app.models.message import Message
 
-import app.crud.weather_station_model as crud
+import app.service.weather_station_model as service
 
 
 router = APIRouter()
@@ -25,8 +26,8 @@ def read_weather_station_model(session: SessionDep, id: uuid.UUID) -> Any:
     Get weather station model by ID.
     """
 
-    weather_station_model = crud.get_weather_station_model_by_id(
-        session=session, weather_station_model_id=id
+    weather_station_model = service.get_weather_station_model_by_id(
+        session=session, id=id
     )
 
     if not weather_station_model:
@@ -35,72 +36,61 @@ def read_weather_station_model(session: SessionDep, id: uuid.UUID) -> Any:
     return weather_station_model
 
 
-@router.post("/", response_model=WeatherStationModelPublic)
+@router.post("/", response_model=WeatherStationModelPublic, dependencies=[Depends(deps.authorize_create_weather_station_model)])
 def create_weather_station_model(
-    *, session: SessionDep, current_user: CurrentUser, weather_station_model_in: WeatherStationModelCreate
+    *, session: SessionDep, weather_station_model_in: WeatherStationModelCreate
 ) -> Any:
     """
     Create new weather station model.
     """
     
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    try:
+        weather_station_model = service.create_weather_station_model(
+            session=session, weather_station_model_in=weather_station_model_in
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     
-    weather_station_model = crud.create_weather_station_model(
-        session=session, weather_station_model_in=weather_station_model_in
-    )
     return weather_station_model
 
 
-@router.put("/{id}", response_model=WeatherStationModelPublic)
+@router.put("/{id}", response_model=WeatherStationModelPublic, dependencies=[Depends(deps.authorize_update_weather_station_model)])
 def update_weather_station_model(
     *,
     session: SessionDep,
-    current_user: CurrentUser,
     id: uuid.UUID,
     weather_station_model_in: WeatherStationModelUpdate,
 ) -> Any:
     """
     Update a weather station model.
     """
+    
+    try:
+        updated_weather_station_model = service.update_weather_station_model(
+            session=session, id=id, weather_station_model_in=weather_station_model_in
+        )
 
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+        if update_weather_station_model is None:
+            raise HTTPException(status_code=404, detail="Weather Station Model not found")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     
-    weather_station_model = crud.get_weather_station_model_by_id(
-        session=session, weather_station_model_id=id
-    )
-    
-    if not weather_station_model:
-        raise HTTPException(status_code=404, detail="Weather Station Model not found")
-    
-    updated_weather_station_model = crud.update_weather_station_model(
-        session=session,
-        db_weather_station_model=weather_station_model,
-        weather_station_model_in=weather_station_model_in,
-    )
     return updated_weather_station_model
 
 
-@router.delete("/{id}")
+@router.delete("/{id}", response_model=Message, dependencies=[Depends(deps.authorize_delete_weather_station_model)])
 def delete_weather_station_model(
-    *, session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+    *, session: SessionDep, id: uuid.UUID
 ) -> Message:
     """
     Delete a weather station model.
     """
     
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
-    
-    weather_station_model = crud.get_weather_station_model_by_id(
-        session=session, weather_station_model_id=id
+    deleted_weather_station_model = service.delete_weather_station_model(
+        session=session, id=id
     )
-    
-    if not weather_station_model:
+
+    if deleted_weather_station_model is None:
         raise HTTPException(status_code=404, detail="Weather Station Model not found")
     
-    crud.delete_weather_station_model(
-        session=session, weather_station_model=weather_station_model
-    )
     return Message(message="Weather Station Model deleted successfully")

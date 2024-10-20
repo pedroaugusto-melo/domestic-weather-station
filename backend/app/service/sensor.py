@@ -14,8 +14,8 @@ def create_sensor(*, session: Session, sensor_in: SensorCreate) -> Sensor:
     return crud.create_sensor(session=session, sensor_in=sensor_in)
 
 
-def update_sensor(*, session: Session, id: uuid.UUID, sensor_in: SensorUpdate) -> Sensor:
-    sensor = crud.get_sensor_by_id(session=session, sensor_id=id)
+def update_sensor(*, session: Session, id: uuid.UUID, sensor_in: SensorUpdate) -> Sensor | None:
+    sensor = get_sensor_by_id(session=session, sensor_id=id)
 
     if sensor is None:
         return None
@@ -23,8 +23,8 @@ def update_sensor(*, session: Session, id: uuid.UUID, sensor_in: SensorUpdate) -
     return crud.update_sensor(session=session, db_sensor=sensor, sensor_in=sensor_in)
 
 
-def delete_sensor(*, session: Session, id: uuid.UUID) -> Sensor:
-    sensor = crud.get_sensor_by_id(session=session, sensor_id=id)
+def delete_sensor(*, session: Session, id: uuid.UUID) -> Sensor | None:
+    sensor = get_sensor_by_id(session=session, sensor_id=id)
 
     if sensor is None:
         return None
