@@ -31,7 +31,7 @@ def read_temperature_reading(session: SessionDep, id: uuid.UUID) -> Any:
     return temperature_reading
 
 
-@router.get("/weather_stations/{id}", response_model=list[TemperatureReadingPublic], dependencies=[Depends(deps.authorize_read_weather_station_temperature_readings)])
+@router.get("/weather-stations/{id}", response_model=list[TemperatureReadingPublic], dependencies=[Depends(deps.authorize_read_weather_station_temperature_readings)])
 def read_weather_station_temperature_readings(session: SessionDep, id: uuid.UUID, skip: int = 0, limit: int = 1000) -> Any:
     """
     Get temperature readings by Weather Station ID.

@@ -55,7 +55,7 @@ def read_weather_station_model_sensor(
     return wsms
 
 
-@router.get("/model/{model_id}", response_model=List[WeatherStationModelSensorPublic], dependencies=[Depends(deps.authorize_read_weather_station_model_sensor)])
+@router.get("/models/{model_id}", response_model=List[WeatherStationModelSensorPublic], dependencies=[Depends(deps.authorize_read_weather_station_model_sensor)])
 def read_associations_by_model_id(
     *,
     session: SessionDep,
@@ -72,7 +72,7 @@ def read_associations_by_model_id(
     return wsms_list
 
 
-@router.get("/sensor/{sensor_id}", response_model=List[WeatherStationModelSensorPublic], dependencies=[Depends(deps.authorize_read_weather_station_model_sensor)])
+@router.get("/sensors/{sensor_id}", response_model=List[WeatherStationModelSensorPublic], dependencies=[Depends(deps.authorize_read_weather_station_model_sensor)])
 def read_associations_by_sensor_id(
     *,
     session: SessionDep,
