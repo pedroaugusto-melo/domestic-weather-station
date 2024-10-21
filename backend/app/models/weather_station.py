@@ -32,7 +32,7 @@ class WeatherStation(WeatherStationBase, table=True):
     # Relationships
     user: User = Relationship(back_populates="weather_stations")
     weather_station_model: WeatherStationModel = Relationship(back_populates="weather_stations")
-    temperature_readings: list["TemperatureReading"] = Relationship(back_populates="weather_station") # type: ignore
+    temperature_readings: list["TemperatureReading"] = Relationship(back_populates="weather_station", cascade_delete=True) # type: ignore
 
     __tablename__ = "weather_station"
 

@@ -76,7 +76,7 @@ def delete_user(session: Session, id: uuid.UUID) -> User | None:
     if user is None:
         return None
 
-    return crud.delete_user(session=session, db_user=user)
+    return crud.delete_user(session=session, user=user)
 
 
 def register_user(session: Session, user_in: UserRegister) -> User:

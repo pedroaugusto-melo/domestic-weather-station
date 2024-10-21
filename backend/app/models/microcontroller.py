@@ -24,7 +24,7 @@ class MicrocontrollerUpdate(MicrocontrollerBase):
 # Database model
 class Microcontroller(MicrocontrollerBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    weather_station_models: list["WeatherStationModel"] = Relationship(back_populates="microcontroller") # type: ignore
+    weather_station_models: list["WeatherStationModel"] = Relationship(back_populates="microcontroller", cascade_delete=True) # type: ignore
 
 # Properties to return via API
 class MicrocontrollerPublic(MicrocontrollerBase):

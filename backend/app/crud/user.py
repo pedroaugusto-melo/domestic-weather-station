@@ -52,7 +52,7 @@ def get_users(*, session: Session, skip: int = 0, limit: int = 100) -> list[User
     return users
 
 
-def delele_user(*, session: Session, user: User) -> User:
+def delete_user(*, session: Session, user: User) -> User:
     session.delete(user)
     session.commit()
     return user

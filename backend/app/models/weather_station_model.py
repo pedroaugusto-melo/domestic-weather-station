@@ -29,7 +29,7 @@ class WeatherStationModel(WeatherStationModelBase, table=True):
 
     # Relationships
     microcontroller: Microcontroller = Relationship(back_populates="weather_station_models")
-    weather_stations: list["WeatherStation"] = Relationship(back_populates="weather_station_model") # type: ignore
+    weather_stations: list["WeatherStation"] = Relationship(back_populates="weather_station_model", cascade_delete=True) # type: ignore
     sensors: list["WeatherStationModelSensor"] = Relationship(back_populates="weather_station_model") # type: ignore
 
     __tablename__ = "weather_station_model"
