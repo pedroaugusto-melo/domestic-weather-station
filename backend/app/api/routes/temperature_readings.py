@@ -3,30 +3,26 @@ from typing import Any
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.api.deps.user import CurrentUser, get_current_user
 from app.api.deps.db import SessionDep
+import app.api.deps.temperature_reading as deps
 
-from app.models.temperature_reading import (
-    TemperatureReadingCreate,
-    TemperatureReadingUpdate,
-    TemperatureReadingPublic,
-)
+from app.models.temperature_reading import TemperatureReadingPublic
 from app.models.message import Message
 
-import app.crud.temperature_reading as crud
+import app.service.temperature_reading as service
 
 
 router = APIRouter()
 
 
-@router.get("/{id}", response_model=TemperatureReadingPublic, dependencies=[Depends(get_current_user)])
+@router.get("/{id}", response_model=TemperatureReadingPublic, dependencies=[Depends(deps.authorize_read_temperature_reading)])
 def read_temperature_reading(session: SessionDep, id: uuid.UUID) -> Any:
     """
     Get temperature reading by ID.
     """
 
-    temperature_reading = crud.get_temperature_reading_by_id(
-        session=session, temperature_reading_id=id
+    temperature_reading = service.get_temperature_reading_by_id(
+        session=session, id=id
     )
 
     if not temperature_reading:
@@ -35,71 +31,32 @@ def read_temperature_reading(session: SessionDep, id: uuid.UUID) -> Any:
     return temperature_reading
 
 
-@router.post("/", response_model=TemperatureReadingPublic)
-def create_temperature_reading(
-    *, session: SessionDep, current_user: CurrentUser, temperature_reading_in: TemperatureReadingCreate
-) -> Any:
+@router.get("/weather_stations/{id}", response_model=list[TemperatureReadingPublic], dependencies=[Depends(deps.authorize_read_weather_station_temperature_readings)])
+def read_weather_station_temperature_readings(session: SessionDep, id: uuid.UUID, skip: int = 0, limit: int = 1000) -> Any:
     """
-    Create new temperature reading.
+    Get temperature readings by Weather Station ID.
     """
 
-    if not current_user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    
-    temperature_reading = crud.create_temperature_reading(
-        session=session, temperature_reading_in=temperature_reading_in
+    temperature_readings = service.get_temperature_readings_by_weather_station_id(
+        session=session, weather_station_id=id, skip=skip, limit=limit
     )
-    return temperature_reading
+
+    return temperature_readings
 
 
-@router.put("/{id}", response_model=TemperatureReadingPublic)
-def update_temperature_reading(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-    id: uuid.UUID,
-    temperature_reading_in: TemperatureReadingUpdate,
-) -> Any:
-    """
-    Update a temperature reading.
-    """
-
-    temperature_reading = crud.get_temperature_reading_by_id(
-        session=session, temperature_reading_id=id
-    )
-    
-    if not temperature_reading:
-        raise HTTPException(status_code=404, detail="Temperature Reading not found")
-    
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
-    
-    updated_temperature_reading = crud.update_temperature_reading(
-        session=session,
-        db_temperature_reading=temperature_reading,
-        temperature_reading_in=temperature_reading_in,
-    )
-    return updated_temperature_reading
-
-@router.delete("/{id}")
+@router.delete("/{id}", response_model=Message, dependencies=[Depends(deps.authorize_delete_temperature_reading)])
 def delete_temperature_reading(
-    *, session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+    *, session: SessionDep, id: uuid.UUID
 ) -> Message:
     """
     Delete a temperature reading.
     """
 
-    temperature_reading = crud.get_temperature_reading_by_id(
-        session=session, temperature_reading_id=id
+    temperature_reading = service.delete_temperature_reading(
+        session=session, id=id
     )
     
     if not temperature_reading:
         raise HTTPException(status_code=404, detail="Temperature Reading not found")
     
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
-    
-    crud.delete_temperature_reading(
-        session=session, temperature_reading=temperature_reading
-    )
     return Message(message="Temperature Reading deleted successfully")

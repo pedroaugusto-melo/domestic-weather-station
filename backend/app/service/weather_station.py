@@ -12,6 +12,10 @@ def get_weather_station_by_id(session: Session, id: uuid.UUID) -> WeatherStation
     return crud.get_weather_station_by_id(session=session, weather_station_id=id)
 
 
+def get_weather_station_by_part_number(session: Session, part_number: str) -> WeatherStation | None:
+    return crud.get_weather_station_by_part_number(session=session, part_number=part_number)
+
+
 def create_weather_station(session: Session, weather_station_in: WeatherStationCreate) -> WeatherStation:
     user = user_service.get_user_by_id(session=session, id=weather_station_in.user_id)
 

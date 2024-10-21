@@ -6,10 +6,10 @@ import json
 from app.core.config import settings
 from app.core.db import engine
 
-import app.crud.sensor as sensor_crud
-import app.crud.weather_station as weather_station_crud
+import app.service.sensor as sensor_service
+import app.service.weather_station as weather_station_service
+import app.service.temperature_reading as temperature_reading_service
 
-import app.crud.temperature_reading as temperature_reading_crud
 from app.models.temperature_reading import TemperatureReadingCreate
 
 class MQTTTopics(StrEnum):
@@ -25,10 +25,16 @@ def on_mqtt_message(client, userdata, msg):
     if msg.topic == MQTTTopics.TEMPERATURE:
         with Session(engine) as session:
             sensor_part_number = data['sensor_part_number']
-            sensor = sensor_crud.get_sensor_by_part_number(session=session, part_number=sensor_part_number)
+            sensor = sensor_service.get_sensor_by_part_number(session=session, part_number=sensor_part_number)
             
+            if sensor is None:
+                raise ValueError(f"Sensor with part number {sensor_part_number} not found")
+
             weather_station_part_number = data['station_part_number']
-            weather_station = weather_station_crud.get_weather_station_by_part_number(session=session, part_number=weather_station_part_number)
+            weather_station = weather_station_service.get_weather_station_by_part_number(session=session, part_number=weather_station_part_number)
+
+            if weather_station is None:
+                raise ValueError(f"Weather Station with part number {weather_station_part_number} not found")
 
             temperature_reading = TemperatureReadingCreate(
                 sensor_id=sensor.id,
@@ -36,11 +42,8 @@ def on_mqtt_message(client, userdata, msg):
                 value=data['temperature'],
                 read_at=data['read_at']
             )
-            temperature_reading_crud.create_temperature_reading(session=session, temperature_reading_in=temperature_reading)
-        
-    
+            temperature_reading_service.create_temperature_reading(session=session, temperature_reading_in=temperature_reading)
 
-    pass
 
 def setup_mqtt_client():
     client = mqtt.Client()

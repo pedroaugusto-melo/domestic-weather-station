@@ -1,5 +1,5 @@
 import uuid
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.models.temperature_reading import (
     TemperatureReading,
@@ -33,6 +33,13 @@ def get_temperature_reading_by_id(
     *, session: Session, temperature_reading_id: uuid.UUID
 ) -> TemperatureReading | None:
     return session.get(TemperatureReading, temperature_reading_id)
+
+
+def get_temperature_readings_by_weather_station_id(
+    *, session: Session, weather_station_id: uuid.UUID, skip: int = 0, limit: int = 1000
+) -> list[TemperatureReading]:
+    statement = select(TemperatureReading).where(TemperatureReading.weather_station_id == weather_station_id).offset(skip).limit(limit)
+    return session.exec(statement).all()
 
 
 def delete_temperature_reading(

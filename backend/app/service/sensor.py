@@ -14,6 +14,10 @@ def create_sensor(*, session: Session, sensor_in: SensorCreate) -> Sensor:
     return crud.create_sensor(session=session, sensor_in=sensor_in)
 
 
+def get_sensor_by_part_number(*, session: Session, part_number: str) -> Sensor | None:
+    return crud.get_sensor_by_part_number(session=session, part_number=part_number)
+
+
 def update_sensor(*, session: Session, id: uuid.UUID, sensor_in: SensorUpdate) -> Sensor | None:
     sensor = get_sensor_by_id(session=session, sensor_id=id)
 
