@@ -27,7 +27,7 @@ def create_weather_station_model_sensor(session: Session, wsms_in: WeatherStatio
     if weather_station_model is None:
         raise ValueError(f"Weather Station Model with ID {wsms_in.weather_station_model_id} not found")
     
-    sensor = sensor_service.get_sensor_by_id(session=session, sensor_id=wsms_in.sensor_id)
+    sensor = sensor_service.get_sensor_by_id(session=session, id=wsms_in.sensor_id)
 
     if sensor is None:
         raise ValueError(f"Sensor with ID {wsms_in.sensor_id} not found")
@@ -48,7 +48,7 @@ def update_weather_station_model_sensor(session: Session, id: uuid.UUID, wsms_in
             raise ValueError(f"Weather Station Model with ID {wsms_in.weather_station_model_id} not found")
 
     if wsms_in.sensor_id:
-        sensor = sensor_service.get_sensor_by_id(session=session, sensor_id=wsms_in.sensor_id)
+        sensor = sensor_service.get_sensor_by_id(session=session, id=wsms_in.sensor_id)
 
         if sensor is None:
             raise ValueError(f"Sensor with ID {wsms_in.sensor_id} not found")

@@ -6,8 +6,8 @@ from app.models.sensor import Sensor, SensorCreate, SensorUpdate
 import app.crud.sensor as crud
 
 
-def get_sensor_by_id(*, session: Session, sensor_id: uuid.UUID) -> Sensor | None:
-    return crud.get_sensor_by_id(session=session, sensor_id=sensor_id)
+def get_sensor_by_id(*, session: Session, id: uuid.UUID) -> Sensor | None:
+    return crud.get_sensor_by_id(session=session, id=id)
 
 
 def create_sensor(*, session: Session, sensor_in: SensorCreate) -> Sensor:
@@ -19,7 +19,7 @@ def get_sensor_by_part_number(*, session: Session, part_number: str) -> Sensor |
 
 
 def update_sensor(*, session: Session, id: uuid.UUID, sensor_in: SensorUpdate) -> Sensor | None:
-    sensor = get_sensor_by_id(session=session, sensor_id=id)
+    sensor = get_sensor_by_id(session=session, id=id)
 
     if sensor is None:
         return None
@@ -28,9 +28,9 @@ def update_sensor(*, session: Session, id: uuid.UUID, sensor_in: SensorUpdate) -
 
 
 def delete_sensor(*, session: Session, id: uuid.UUID) -> Sensor | None:
-    sensor = get_sensor_by_id(session=session, sensor_id=id)
+    sensor = get_sensor_by_id(session=session, id=id)
 
     if sensor is None:
         return None
 
-    return crud.delete_sensor(session=session, sensor=sensor)
+    return crud.delete_sensor(session=session, db_sensor=sensor)

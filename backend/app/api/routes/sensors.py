@@ -23,7 +23,7 @@ def read_sensor(session: SessionDep, id: uuid.UUID) -> Any:
     Get sensor by ID.
     """
 
-    sensor = service.get_sensor_by_id(session=session, sensor_id=id)
+    sensor = service.get_sensor_by_id(session=session, id=id)
 
     if sensor is None:
         raise HTTPException(status_code=404, detail="Sensor not found")

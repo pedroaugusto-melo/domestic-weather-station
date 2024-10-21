@@ -18,7 +18,7 @@ def get_temperature_readings_by_weather_station_id(session: Session, weather_sta
 
 
 def create_temperature_reading(session: Session, temperature_reading_in: TemperatureReadingCreate) -> TemperatureReading:
-    sensor = sensor_service.get_sensor_by_id(session=session, sensor_id=temperature_reading_in.sensor_id)
+    sensor = sensor_service.get_sensor_by_id(session=session, id=temperature_reading_in.sensor_id)
 
     if sensor is None:
         raise ValueError(f"Sensor with ID {temperature_reading_in.sensor_id} not found")
@@ -38,7 +38,7 @@ def update_temperature_reading(session: Session, id: uuid.UUID, temperature_read
         return None
     
     if temperature_reading_in.sensor_id:
-        sensor = sensor_service.get_sensor_by_id(session=session, sensor_id=temperature_reading_in.sensor_id)
+        sensor = sensor_service.get_sensor_by_id(session=session, id=temperature_reading_in.sensor_id)
         
         if sensor is None:
             raise ValueError(f"Sensor with ID {temperature_reading_in.sensor_id} not found")

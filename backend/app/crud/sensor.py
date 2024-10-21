@@ -21,8 +21,8 @@ def update_sensor(*, session: Session, db_sensor: Sensor, sensor_in: SensorUpdat
     return db_sensor
 
 
-def get_sensor_by_id(*, session: Session, sensor_id: uuid.UUID) -> Sensor | None:
-    return session.get(Sensor, sensor_id)
+def get_sensor_by_id(*, session: Session, id: uuid.UUID) -> Sensor | None:
+    return session.get(Sensor, id)
 
 
 def get_sensor_by_part_number(*, session: Session, part_number: str) -> Sensor | None:
@@ -31,7 +31,7 @@ def get_sensor_by_part_number(*, session: Session, part_number: str) -> Sensor |
     return session_sensor
 
 
-def delete_sensor(*, session: Session, sensor: Sensor) -> Sensor:
-    session.delete(sensor)
+def delete_sensor(*, session: Session, db_sensor: Sensor) -> Sensor:
+    session.delete(db_sensor)
     session.commit()
-    return sensor
+    return db_sensor
