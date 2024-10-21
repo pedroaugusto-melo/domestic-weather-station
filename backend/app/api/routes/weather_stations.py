@@ -1,9 +1,9 @@
 import uuid
 from typing import Any
+from sqlalchemy.exc import IntegrityError
 
 from fastapi import APIRouter, HTTPException, Depends
 
-from app.api.deps.user import CurrentUser
 from app.api.deps.db import SessionDep
 import app.api.deps.weather_station as deps
 
@@ -35,7 +35,7 @@ def read_weather_station(session: SessionDep, id: uuid.UUID) -> Any:
 
 @router.post("/", response_model=WeatherStationPublic, dependencies=[Depends(deps.authorize_create_weather_station)])
 def create_weather_station(
-    *, session: SessionDep, current_user: CurrentUser, weather_station_in: WeatherStationCreate
+    *, session: SessionDep, weather_station_in: WeatherStationCreate
 ) -> Any:
     """
     Create new weather station.
@@ -43,7 +43,7 @@ def create_weather_station(
     
     try:
         created_weather_station = service.create_weather_station(session=session, weather_station_in=weather_station_in)
-    except ValueError as e:
+    except (ValueError, IntegrityError) as e:
         raise HTTPException(status_code=400, detail=str(e))
 
     return created_weather_station
@@ -62,11 +62,11 @@ def update_weather_station(
     
     try:
         updated_weather_station = service.update_weather_station(session=session, id=id, weather_station_in=weather_station_in)
-
-        if update_weather_station is None:
-            raise HTTPException(status_code=404, detail="Weather Station not found")
-    except ValueError as e:
+    except (ValueError, IntegrityError) as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+    if update_weather_station is None:
+            raise HTTPException(status_code=404, detail="Weather Station not found")
     
     return updated_weather_station
 

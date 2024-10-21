@@ -2,9 +2,10 @@ import uuid
 from typing import Any, List
 
 from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.exc import IntegrityError
 
-from app.api.deps.user import CurrentUser, get_current_user
 from app.api.deps.db import SessionDep
+import app.api.deps.weather_station_model_sensor as deps
 
 from app.models.weather_station_model_sensor import (
     WeatherStationModelSensorCreate,
@@ -13,30 +14,30 @@ from app.models.weather_station_model_sensor import (
 )
 from app.models.message import Message
 
-import app.crud.weather_station_model_sensor as crud
+import app.service.weather_station_model_sensor as service
 
 
 router = APIRouter()
 
 
-@router.post("/", response_model=WeatherStationModelSensorPublic)
+@router.post("/", response_model=WeatherStationModelSensorPublic, dependencies=[Depends(deps.authorize_create_weather_station_model_sensor)])
 def create_weather_station_model_sensor(
     *,
     session: SessionDep,
-    current_user: CurrentUser,
     wsms_in: WeatherStationModelSensorCreate
 ) -> Any:
     """
     Create a new association between Weather Station Model and Sensor.
     """
+    try:
+        wsms = service.create_weather_station_model_sensor(session=session, wsms_in=wsms_in)
+    except (ValueError, IntegrityError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-    wsms = crud.create_weather_station_model_sensor(session=session, wsms_in=wsms_in)
     return wsms
 
 
-@router.get("/{id}", response_model=WeatherStationModelSensorPublic, dependencies=[Depends(get_current_user)])
+@router.get("/{id}", response_model=WeatherStationModelSensorPublic, dependencies=[Depends(deps.authorize_read_weather_station_model_sensor)])
 def read_weather_station_model_sensor(
     *,
     session: SessionDep,
@@ -46,15 +47,15 @@ def read_weather_station_model_sensor(
     Get an association by ID.
     """
 
-    wsms = crud.get_weather_station_model_sensor_by_id(session=session, id=id)
+    wsms = service.get_weather_station_model_sensor_by_id(session=session, id=id)
 
-    if not wsms:
-        raise HTTPException(status_code=404, detail="Association not found")
+    if wsms is None:
+        raise HTTPException(status_code=404, detail="Weather station model sensor not found")
     
     return wsms
 
 
-@router.get("/model/{model_id}", response_model=List[WeatherStationModelSensorPublic], dependencies=[Depends(get_current_user)])
+@router.get("/model/{model_id}", response_model=List[WeatherStationModelSensorPublic], dependencies=[Depends(deps.authorize_read_weather_station_model_sensor)])
 def read_associations_by_model_id(
     *,
     session: SessionDep,
@@ -64,14 +65,14 @@ def read_associations_by_model_id(
     Get associations by Weather Station Model ID.
     """
 
-    wsms_list = crud.get_weather_station_model_sensors_by_model_id(
-        session=session, weather_station_model_id=model_id
+    wsms_list = service.get_weather_station_model_sensor_by_model_id(
+        session=session, model_id=model_id
     )
 
     return wsms_list
 
 
-@router.get("/sensor/{sensor_id}", response_model=List[WeatherStationModelSensorPublic], dependencies=[Depends(get_current_user)])
+@router.get("/sensor/{sensor_id}", response_model=List[WeatherStationModelSensorPublic], dependencies=[Depends(deps.authorize_read_weather_station_model_sensor)])
 def read_associations_by_sensor_id(
     *,
     session: SessionDep,
@@ -81,17 +82,17 @@ def read_associations_by_sensor_id(
     Get associations by Sensor ID.
     """
 
-    wsms_list = crud.get_weather_station_model_sensors_by_sensor_id(
+    wsms_list = service.get_weather_station_model_sensor_by_sensor_id(
         session=session, sensor_id=sensor_id
     )
+
     return wsms_list
 
 
-@router.put("/{id}", response_model=WeatherStationModelSensorPublic)
+@router.put("/{id}", response_model=WeatherStationModelSensorPublic, dependencies=[Depends(deps.authorize_update_weather_station_model_sensor)])
 def update_weather_station_model_sensor(
     *,
     session: SessionDep,
-    current_user: CurrentUser,
     id: uuid.UUID,
     wsms_in: WeatherStationModelSensorUpdate
 ) -> Any:
@@ -99,38 +100,30 @@ def update_weather_station_model_sensor(
     Update an association by ID.
     """
 
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-    
-    wsms = crud.get_weather_station_model_sensor_by_id(session=session, id=id)
-    
-    if not wsms:
-        raise HTTPException(status_code=404, detail="Association not found")
-    wsms = crud.update_weather_station_model_sensor(
-        session=session, db_obj=wsms, obj_in=wsms_in
-    )
-    
+    try:
+        wsms = service.update_weather_station_model_sensor(session=session, id=id, wsms_in=wsms_in)
+    except (ValueError, IntegrityError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if wsms is None:
+        raise HTTPException(status_code=404, detail="Weather station model sensor not found")
+
     return wsms
 
 
-@router.delete("/{id}", response_model=Message)
+@router.delete("/{id}", response_model=Message, dependencies=[Depends(deps.authorize_delete_weather_station_model_sensor)])
 def delete_weather_station_model_sensor(
     *,
     session: SessionDep,
-    current_user: CurrentUser,
     id: uuid.UUID
 ) -> Any:
     """
     Delete an association by ID.
     """
-
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
     
-    wsms = crud.get_weather_station_model_sensor_by_id(session=session, id=id)
+    wsms = service.delete_weather_station_model_sensor(session=session, id=id)
 
-    if not wsms:
-        raise HTTPException(status_code=404, detail="Association not found")
+    if wsms is None:
+        raise HTTPException(status_code=404, detail="Weather station model sensor not found")
     
-    crud.delete_weather_station_model_sensor(session=session, id=id)
-    return Message(message="Association deleted successfully")
+    return Message(message="Weather station model sensor deleted successfully")

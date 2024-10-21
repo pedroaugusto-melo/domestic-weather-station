@@ -44,15 +44,15 @@ def get_weather_station_model_sensors_by_sensor_id(
 
 
 def update_weather_station_model_sensor(
-    *, session: Session, db_obj: WeatherStationModelSensor, obj_in: WeatherStationModelSensorUpdate
+    *, session: Session, wsms: WeatherStationModelSensor, wsms_in: WeatherStationModelSensorUpdate
 ) -> WeatherStationModelSensor:
-    obj_data = obj_in.dict(exclude_unset=True)
+    obj_data = wsms_in.dict(exclude_unset=True)
     for key, value in obj_data.items():
-        setattr(db_obj, key, value)
-    session.add(db_obj)
+        setattr(wsms, key, value)
+    session.add(wsms)
     session.commit()
-    session.refresh(db_obj)
-    return db_obj
+    session.refresh(wsms)
+    return wsms
 
 
 def delete_weather_station_model_sensor(

@@ -69,12 +69,12 @@ def update_weather_station_model(
         updated_weather_station_model = service.update_weather_station_model(
             session=session, id=id, weather_station_model_in=weather_station_model_in
         )
-
-        if update_weather_station_model is None:
-            raise HTTPException(status_code=404, detail="Weather Station Model not found")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     
+    if update_weather_station_model is None:
+        raise HTTPException(status_code=404, detail="Weather Station Model not found")
+
     return updated_weather_station_model
 
 

@@ -1,5 +1,6 @@
 import uuid
 from typing import Any
+from sqlalchemy.exc import IntegrityError
 
 from fastapi import APIRouter, HTTPException, Depends
 
@@ -42,7 +43,11 @@ def create_microcontroller(
     Create new microcontroller.
     """
     
-    microcontroller = service.create_microcontroller(session=session, microcontroller_in=microcontroller_in)
+    try:
+        microcontroller = service.create_microcontroller(session=session, microcontroller_in=microcontroller_in)
+    except IntegrityError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
     return microcontroller
 
 
@@ -55,10 +60,13 @@ def update_microcontroller(
 ) -> Any:
     """
     Update a microcontroller.
+    
     """
-    
-    updated_microcontroller = service.update_microcontroller(id=id, session=session, microcontroller_in=microcontroller_in)
-    
+    try:
+        updated_microcontroller = service.update_microcontroller(id=id, session=session, microcontroller_in=microcontroller_in)
+    except IntegrityError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     if not updated_microcontroller:
         raise HTTPException(status_code=404, detail="Microcontroller not found")
     

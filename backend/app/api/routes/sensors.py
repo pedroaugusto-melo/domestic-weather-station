@@ -1,5 +1,6 @@
 import uuid
 from typing import Any
+from sqlalchemy.exc import IntegrityError
 
 from fastapi import APIRouter, HTTPException, Depends
 
@@ -37,8 +38,11 @@ def create_sensor(
     """
     Create new sensor.
     """
+    try:
+        sensor = service.create_sensor(session=session, sensor_in=sensor_in)
+    except IntegrityError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    sensor = service.create_sensor(session=session, sensor_in=sensor_in)
     return sensor
 
 
@@ -53,8 +57,11 @@ def update_sensor(
     Update an sensor.
     """
 
-    updated_sensor = service.update_sensor(session=session, id=id, sensor_in=sensor_in)
-    
+    try:
+        updated_sensor = service.update_sensor(session=session, id=id, sensor_in=sensor_in)
+    except IntegrityError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
     if updated_sensor is None:
         raise HTTPException(status_code=404, detail="Sensor not found")
     
