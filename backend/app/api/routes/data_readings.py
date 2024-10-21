@@ -6,10 +6,9 @@ from fastapi import APIRouter, HTTPException, Depends
 from app.api.deps.db import SessionDep
 import app.api.deps.data_reading as deps
 
-from app.constants.reading_types import ReadingTypes
+from app.constants.data_reading_types import ReadingTypes
 
-from app.models.temperature_reading import TemperatureReadingPublic
-from app.models.gas_level_reading import GasLevelReadingPublic
+from app.constants.data_reading_types import DataReadingPublicTypes
 from app.models.message import Message
 
 import app.service.data_reading as service
@@ -18,7 +17,7 @@ import app.service.data_reading as service
 router = APIRouter()
 
 
-@router.get("/{id}", response_model=TemperatureReadingPublic | GasLevelReadingPublic, dependencies=[Depends(deps.authorize_read_data_reading)])
+@router.get("/{id}", response_model=DataReadingPublicTypes, dependencies=[Depends(deps.authorize_read_data_reading)])
 def read_data_reading(session: SessionDep, id: uuid.UUID, type: ReadingTypes) -> Any:
     """
     Get data reading by ID.
@@ -34,7 +33,7 @@ def read_data_reading(session: SessionDep, id: uuid.UUID, type: ReadingTypes) ->
     return data_reading
 
 
-@router.get("/weather-stations/{id}", response_model=list[TemperatureReadingPublic | GasLevelReadingPublic], dependencies=[Depends(deps.authorize_read_weather_station_data_readings)])
+@router.get("/weather-stations/{id}", response_model=list[DataReadingPublicTypes], dependencies=[Depends(deps.authorize_read_weather_station_data_readings)])
 def read_weather_station_data_readings(session: SessionDep, id: uuid.UUID, type: ReadingTypes, skip: int = 0, limit: int = 1000) -> Any:
     """
     Get data readings by Weather Station ID.

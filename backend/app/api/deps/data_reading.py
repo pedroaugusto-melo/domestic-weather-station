@@ -3,7 +3,7 @@ import uuid
 
 from app.api.deps.user import CurrentUser
 from app.api.deps.db import SessionDep
-from app.constants.reading_types import ReadingTypes
+from app.constants.data_reading_types import ReadingTypes
 
 import app.service.data_reading as service
 import app.service.weather_station as weather_station_service

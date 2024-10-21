@@ -1,23 +1,14 @@
 import uuid
 from sqlmodel import Session, select
 
-from app.constants.reading_types import ReadingTypes
+from app.constants.data_reading_types import ReadingTypes
 
-from app.models.temperature_reading import TemperatureReading, TemperatureReadingCreate, TemperatureReadingUpdate
-from app.models.gas_level_reading import GasLevelReading, GasLevelReadingCreate, GasLevelReadingUpdate
-from app.models.humidity_reading import HumidityReading, HumidityReadingCreate, HumidityReadingUpdate
-
-
-DataReadingTypesClasses = TemperatureReading | GasLevelReading | HumidityReading
-DataReadingCreateTypesClasses = TemperatureReadingCreate | GasLevelReadingCreate | HumidityReadingCreate
-DataReadingUpdateTypesClasses = TemperatureReadingUpdate | GasLevelReadingUpdate | HumidityReadingUpdate
-
-
-ReadingClassesByType = {
-    ReadingTypes.TEMPERATURE: TemperatureReading,
-    ReadingTypes.GAS_LEVEL: GasLevelReading,
-    ReadingTypes.HUMIDITY: HumidityReading,
-}
+from app.constants.data_reading_types import (
+    ReadingClassesByType, 
+    DataReadingTypesClasses, 
+    DataReadingCreateTypesClasses, 
+    DataReadingUpdateTypesClasses
+)
 
 
 def create_data_reading(

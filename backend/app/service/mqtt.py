@@ -5,7 +5,7 @@ import json
 
 from app.core.config import settings
 from app.core.db import engine
-from app.constants.reading_types import ReadingTypes
+from app.constants.data_reading_types import ReadingTypes
 
 import app.service.sensor as sensor_service
 import app.service.weather_station as weather_station_service
@@ -14,6 +14,7 @@ import app.service.data_reading as data_reading_service
 from app.models.temperature_reading import TemperatureReadingCreate
 from app.models.gas_level_reading import GasLevelReadingCreate
 from app.models.humidity_reading import HumidityReadingCreate
+
 
 class MQTTTopics(StrEnum):
     TEMPERATURE = "temperature/domestic_weather_station"
@@ -69,11 +70,9 @@ def setup_mqtt_client():
     client.connect(settings.MQTT_BROKER_HOST, settings.MQTT_BROKER_PORT, 60)
     
     client.on_message = on_mqtt_message
-    
-    client.subscribe(MQTTTopics.TEMPERATURE)
-    client.subscribe(MQTTTopics.HUMIDITY)
-    client.subscribe(MQTTTopics.HEAT_INDEX)
-    client.subscribe(MQTTTopics.GAS_LEVEL)
+
+    for topic in MQTTTopics:
+        client.subscribe(topic)
     
     client.loop_start()
 

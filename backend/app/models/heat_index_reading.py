@@ -9,37 +9,37 @@ from app.models.weather_station import WeatherStation
 
 
 # Shared properties
-class HumidityReadingBase(SQLModel):
+class HeatIndexReadingBase(SQLModel):
     sensor_id: uuid.UUID = Field(foreign_key="sensor.id")
     weather_station_id: uuid.UUID = Field(foreign_key="weather_station.id")
     value: float
     read_at: datetime
 
 # Properties to receive via API on creation
-class HumidityReadingCreate(HumidityReadingBase):
+class HeatIndexReadingCreate(HeatIndexReadingBase):
     pass
 
 # Properties to receive via API on update, all are optional
-class HumidityReadingUpdate(SQLModel):
+class HeatIndexReadingUpdate(SQLModel):
     sensor_id: Optional[uuid.UUID] = None
     weather_station_id: Optional[uuid.UUID] = None
     value: Optional[float] = None
     read_at: Optional[datetime] = None
 
 # Database model
-class HumidityReading(HumidityReadingBase, table=True):
+class HeatIndexReading(HeatIndexReadingBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     
     # Relationships
-    sensor: Sensor = Relationship(back_populates="humidity_readings")
-    weather_station: WeatherStation = Relationship(back_populates="humidity_readings")
+    sensor: Sensor = Relationship(back_populates="heat_index_readings")
+    weather_station: WeatherStation = Relationship(back_populates="heat_index_readings")
 
-    __tablename__ = "humidity_reading"
+    __tablename__ = "heat_index_reading"
 
 # Properties to return via API
-class HumidityReadingPublic(HumidityReadingBase):
+class HeatIndexReadingPublic(HeatIndexReadingBase):
     id: uuid.UUID
 
-class HumidityReadingsPublic(SQLModel):
-    data: List[HumidityReadingPublic]
+class HeatIndexReadingsPublic(SQLModel):
+    data: List[HeatIndexReadingPublic]
     count: int
