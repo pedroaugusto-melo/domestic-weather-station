@@ -5,6 +5,7 @@ from app.constants.reading_types import ReadingTypes
 
 from app.models.temperature_reading import TemperatureReading, TemperatureReadingCreate, TemperatureReadingUpdate
 from app.models.gas_level_reading import GasLevelReading, GasLevelReadingCreate, GasLevelReadingUpdate
+from app.models.humidity_reading import HumidityReading, HumidityReadingCreate, HumidityReadingUpdate
 
 import app.crud.data_reading as crud
 
@@ -12,15 +13,20 @@ import app.service.sensor as sensor_service
 import app.service.weather_station as weather_station_service
 
 
-def get_data_reading_by_id(session: Session, id: uuid.UUID, reading_type: ReadingTypes) -> TemperatureReading | GasLevelReading | None:
+DataReadingTypesClasses = TemperatureReading | GasLevelReading | HumidityReading
+DataReadingCreateTypesClasses = TemperatureReadingCreate | GasLevelReadingCreate | HumidityReadingCreate
+DataReadingUpdateTypesClasses = TemperatureReadingUpdate | GasLevelReadingUpdate | HumidityReadingUpdate
+
+
+def get_data_reading_by_id(session: Session, id: uuid.UUID, reading_type: ReadingTypes) -> DataReadingTypesClasses | None:
     return crud.get_data_reading_by_id(session=session, data_reading_id=id, reading_type=reading_type)
 
 
-def get_data_readings_by_weather_station_id(session: Session, weather_station_id: uuid.UUID, reading_type: ReadingTypes, skip: int = 0, limit: int = 1000) -> list[TemperatureReading | GasLevelReading]:
+def get_data_readings_by_weather_station_id(session: Session, weather_station_id: uuid.UUID, reading_type: ReadingTypes, skip: int = 0, limit: int = 1000) -> list[DataReadingTypesClasses]:
     return crud.get_data_readings_by_weather_station_id(session=session, weather_station_id=weather_station_id, skip=skip, limit=limit, reading_type=reading_type)
 
 
-def create_data_reading(session: Session, data_reading_in: TemperatureReadingCreate | GasLevelReadingCreate, reading_type: ReadingTypes) -> TemperatureReading | GasLevelReading:
+def create_data_reading(session: Session, data_reading_in: DataReadingCreateTypesClasses, reading_type: ReadingTypes) -> DataReadingTypesClasses | None:
     sensor = sensor_service.get_sensor_by_id(session=session, id=data_reading_in.sensor_id)
 
     if sensor is None:
@@ -34,7 +40,7 @@ def create_data_reading(session: Session, data_reading_in: TemperatureReadingCre
     return crud.create_data_reading(session=session, data_reading_in=data_reading_in, reading_type=reading_type)
 
 
-def update_data_reading(session: Session, id: uuid.UUID, data_reading_in: TemperatureReadingUpdate | GasLevelReadingUpdate, reading_type: ReadingTypes) -> TemperatureReading | GasLevelReading | None:
+def update_data_reading(session: Session, id: uuid.UUID, data_reading_in: DataReadingUpdateTypesClasses, reading_type: ReadingTypes) -> DataReadingTypesClasses | None:
     data_reading = get_data_reading_by_id(session=session, id=id, reading_type=reading_type)
     
     if data_reading is None:
@@ -55,7 +61,7 @@ def update_data_reading(session: Session, id: uuid.UUID, data_reading_in: Temper
     return crud.update_data_reading(session=session, db_data_reading=data_reading, data_reading_in=data_reading_in)
 
 
-def delete_data_reading(session: Session, id: uuid.UUID, reading_type: ReadingTypes) -> TemperatureReading | GasLevelReading | None:
+def delete_data_reading(session: Session, id: uuid.UUID, reading_type: ReadingTypes) -> DataReadingTypesClasses | None:
     data_reading = get_data_reading_by_id(session=session, id=id , reading_type=reading_type)
     
     if data_reading is None:

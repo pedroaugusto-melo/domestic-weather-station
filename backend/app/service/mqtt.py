@@ -13,6 +13,7 @@ import app.service.data_reading as data_reading_service
 
 from app.models.temperature_reading import TemperatureReadingCreate
 from app.models.gas_level_reading import GasLevelReadingCreate
+from app.models.humidity_reading import HumidityReadingCreate
 
 class MQTTTopics(StrEnum):
     TEMPERATURE = "temperature/domestic_weather_station"
@@ -53,7 +54,14 @@ def on_mqtt_message(client, userdata, msg):
                 read_at=data['read_at']
             )
             data_reading_service.create_data_reading(session=session, data_reading_in=gas_level_reading, reading_type=ReadingTypes.GAS_LEVEL)
-
+        elif msg.topic == MQTTTopics.HUMIDITY:
+            humidity_reading = HumidityReadingCreate(
+                sensor_id=sensor.id,
+                weather_station_id=weather_station.id,
+                value=data['humidity'],
+                read_at=data['read_at']
+            )
+            data_reading_service.create_data_reading(session=session, data_reading_in=humidity_reading, reading_type=ReadingTypes.HUMIDITY)
 
 def setup_mqtt_client():
     client = mqtt.Client()
