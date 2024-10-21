@@ -29,8 +29,9 @@ class Sensor(SensorBase, table=True):
     measuremnts_types: list[str] = Field(sa_column=Column(ARRAY(String)))
 
     # Relationships
-    temperature_readings: list["TemperatureReading"] = Relationship(back_populates="sensor", cascade_delete=True) # type: ignore
     weather_station_models: list["WeatherStationModelSensor"] = Relationship(back_populates="sensor", cascade_delete=True) # type: ignore
+    temperature_readings: list["TemperatureReading"] = Relationship(back_populates="sensor", cascade_delete=True) # type: ignore
+    gas_level_readings: list["GasLevelReading"] = Relationship(back_populates="sensor", cascade_delete=True) # type: ignore
 
 # Properties to return via API
 class SensorPublic(SensorBase):
