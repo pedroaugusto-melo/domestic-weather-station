@@ -40,6 +40,13 @@ CurrentUser = Annotated[User, Depends(get_current_user)]
 def get_current_active_superuser(current_user: CurrentUser) -> User:
     if not current_user.is_superuser:
         raise HTTPException(
-            status_code=403, detail="The user doesn't have enough privileges"
+            status_code=403, detail="Not enough permissions"
         )
     return current_user
+
+
+def authorize_read_user(current_user: CurrentUser, user_id: str) -> None:
+    if not current_user.is_superuser and current_user.id != user_id:
+        raise HTTPException(
+            status_code=403, detail="Not enough permissions"
+        )
