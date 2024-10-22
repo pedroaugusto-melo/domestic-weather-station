@@ -8,7 +8,7 @@ O broker redireciona esses dados para os serviços que estiverem "ouvindo" infor
 
 ## Configuração
 
-Para usar o harware da estação climática domética, siga os passos abaixo.
+Para usar o harware da estação climática doméstica, siga os passos abaixo.
 
 ### 1. Configurações do WiFi
 
