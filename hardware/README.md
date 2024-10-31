@@ -28,3 +28,41 @@ Mais informações sobre a configuração do broker podem ser encontradas [aqui]
 ### 3. Upload do código no ESP-32
 
 Para gravar o código fonte do arquivo `./main.ino` no ESP-32, pode-se utilizar a [IDE do Arduino](https://www.arduino.cc/en/software/). A fim de se consiga manipular o ESP-32 nessa IDE, algumas configurações extras são necessárias. Mais detalhes sobre isso podem ser encontrados [aqui](https://www.crescerengenharia.com/post/instalando-esp32-arduino).
+
+## Análise de adição de novos sensores
+
+1. Sensores usados atualmente:
+   1."DHT22": sensor de temperatura e de umidade do ar;
+   2."MQ-135": sensor de gases tóxicos.
+
+2. Sensor "DHT22"
+
+   1. A princípio, seria possível usar o sensor DHT11 para medir temperatura e umidade. Contudo isso não será feito pelas seguintes razões:
+      1. O grupo já dispõe de um DHT22;
+      2. O sensor DHT22 apresenta desempenho superior ao do sensor DHT11: o DHT11 e o DHT22 funcionam bem para intervalos de umidade, respectivamente, de 20% a 80% e de 0% a 100%;
+   2. O DHT22 é um tanto lento (tempo mínimo entre medições consecutivas: 2 segundos). Porém isso não faz diferença para a aplicação proposta;
+   3. Não vejo sentido em trocar o DHT22. Por isso, o melhor e manter esse sensor de temperatura e umidade.
+
+3. Microcontrolador usado: "ESP-32"
+
+4. Sensor "MQ-135"
+
+   1. Sensor de gases tóxicos/nocivos;
+   2. Seu principal alvo é o CO2, mas também é capaz de detectar:
+      1. Compostos orgânicos voláteis;
+      2. Óxidos de nitrogênio (NOx);
+      3. Vapor de etanol;
+      4. Fumaça;
+      5. Amônia;
+   3. Necessita de pré-aquecimento antes de poder fornecer resultados acurados;
+   4. Material ativo: SnO2 (óxido de estanho)
+   5. Defeitos:
+      1. Caso seja exposto a altas concentrações de gases corrosivos (Cl2, NH3, H2S, SO2), deixa rapidamente de funcionar. Portanto, **não pode ser usado para a detecção de compostos de halogênios ou de enxofre**;
+      2. Altamente suscetível a dano por compostos voláteis de silício. Dessa forma, pode ser problemático usá-lo próximo a silicones;
+      3. Não é um bom sensor para gases nocivos com enxofre (H2S, SO2, etc...);
+
+5. Outros possíveis gases nocivos a detectar:
+   1. Vapor de Hg (não achei nenhum sensor que meça especificamente isso);
+   2. Ozônio (candidato promissor: [MQ-131](https://jxctgas.com/product/5605?utm_source=Google%20Shopping&utm_campaign=jxctgas&utm_medium=cpc&utm_term=5383&srsltid=AfmBOoqFbOY-BDIgkuXO6pkAGrfySbw5lRuB9J1SkhT5vf50Gz3K0wQB-jc));
+   3. Óxidos de enxofre (sensores de dióxido de enxofre parecem ser extremamente caros);
+   4. H2S (candidato promissor: [MQ-136](https://www.usinainfo.com.br/sensor-de-gas-arduino/detector-de-gas-sensor-de-gas-mq-136-gas-sulfidrico-h2s-4601.html));
