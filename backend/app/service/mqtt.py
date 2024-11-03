@@ -23,7 +23,7 @@ class MQTTTopics(StrEnum):
     GAS_LEVEL = "gas_level/domestic_weather_station"
 
 
-def on_mqtt_message(client, userdata, msg):
+def on_mqtt_message(client, userdata, msg) -> None:
     data = json.loads(msg.payload.decode())
 
     with Session(engine) as session:
@@ -64,15 +64,18 @@ def on_mqtt_message(client, userdata, msg):
             )
             data_reading_service.create_data_reading(session=session, data_reading_in=humidity_reading, reading_type=ReadingTypes.HUMIDITY)
 
-def setup_mqtt_client():
+def setup_mqtt_client() -> None:
     client = mqtt.Client()
     client.username_pw_set(settings.MQTT_BROKER_USERNAME, settings.MQTT_BROKER_PASSWORD)
     client.connect(settings.MQTT_BROKER_HOST, settings.MQTT_BROKER_PORT, 60)
+    print('Connected to MQTT Broker')
     
     client.on_message = on_mqtt_message
 
     for topic in MQTTTopics:
         client.subscribe(topic)
-    
+    print('Subscribed to MQTT Topics')
+
     client.loop_start()
+    print('Ready to receive messages')
 
