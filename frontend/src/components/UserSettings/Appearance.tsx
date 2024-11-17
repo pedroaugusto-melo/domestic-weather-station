@@ -15,7 +15,7 @@ const Appearance = () => {
     <>
       <Container maxW="full">
         <Heading size="sm" py={4}>
-          Appearance
+          Aparência
         </Heading>
         <RadioGroup onChange={toggleColorMode} value={colorMode}>
           <Stack>
