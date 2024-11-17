@@ -103,10 +103,10 @@ function Login() {
           <InputGroup>
             <Input
               {...register("password", {
-                required: "Password is required",
+                required: "Senha é obrigatória",
               })}
               type={show ? "text" : "password"}
-              placeholder="Password"
+              placeholder="Senha"
               required
             />
             <InputRightElement
@@ -127,15 +127,15 @@ function Login() {
           {error && <FormErrorMessage>{error}</FormErrorMessage>}
         </FormControl>
         <Link as={RouterLink} to="/recover-password" color="blue.500">
-          Forgot password?
+          Esqueceu a senha?
         </Link>
         <Button variant="primary" type="submit" isLoading={isSubmitting}>
           Log In
         </Button>
         <Text>
-          Don't have an account?{" "}
+          Não tem uma conta?{" "}
           <Link as={RouterLink} to="/signup" color="blue.500">
-            Sign up
+            Cadastrar
           </Link>
         </Text>
       </Container>

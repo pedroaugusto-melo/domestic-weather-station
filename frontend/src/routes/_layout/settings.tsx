@@ -17,9 +17,9 @@ import DeleteAccount from "../../components/UserSettings/DeleteAccount"
 import UserInformation from "../../components/UserSettings/UserInformation"
 
 const tabsConfig = [
-  { title: "My profile", component: UserInformation },
-  { title: "Password", component: ChangePassword },
-  { title: "Appearance", component: Appearance },
+  { title: "Meu Perfil", component: UserInformation },
+  { title: "Senha", component: ChangePassword },
+  { title: "Aparência", component: Appearance },
   { title: "Danger zone", component: DeleteAccount },
 ]
 
@@ -37,7 +37,7 @@ function UserSettings() {
   return (
     <Container maxW="full">
       <Heading size="lg" textAlign={{ base: "center", md: "left" }} py={12}>
-        User Settings
+        Configurações de Usuário
       </Heading>
       <Tabs variant="enclosed">
         <TabList>
