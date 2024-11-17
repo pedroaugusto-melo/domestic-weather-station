@@ -77,7 +77,7 @@ const UserInformation = () => {
     <>
       <Container maxW="full">
         <Heading size="sm" py={4}>
-          User Information
+          Informações do usuário
         </Heading>
         <Box
           w={{ sm: "full", md: "50%" }}
@@ -86,7 +86,7 @@ const UserInformation = () => {
         >
           <FormControl>
             <FormLabel color={color} htmlFor="name">
-              Full name
+              Nome Completo
             </FormLabel>
             {editMode ? (
               <Input
@@ -140,11 +140,11 @@ const UserInformation = () => {
               isLoading={editMode ? isSubmitting : false}
               isDisabled={editMode ? !isDirty || !getValues("email") : false}
             >
-              {editMode ? "Save" : "Edit"}
+              {editMode ? "Salvar" : "Editar"}
             </Button>
             {editMode && (
               <Button onClick={onCancel} isDisabled={isSubmitting}>
-                Cancel
+                Cancelar
               </Button>
             )}
           </Flex>

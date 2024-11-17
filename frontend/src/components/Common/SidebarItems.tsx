@@ -7,8 +7,8 @@ import type { UserPublic } from "../../client"
 
 const items = [
   { icon: FiHome, title: "Dashboard", path: "/" },
-  { icon: FiBriefcase, title: "Items", path: "/items" },
-  { icon: FiSettings, title: "User Settings", path: "/settings" },
+  { icon: FiBriefcase, title: "Análise Inteligente", path: "/items" },
+  { icon: FiSettings, title: "Configurações de Usuário", path: "/settings" },
 ]
 
 interface SidebarItemsProps {

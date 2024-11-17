@@ -93,7 +93,7 @@ const Sidebar = () => {
           borderRadius={12}
         >
           <Box>
-            <Image src={Logo} alt="Logo" w="180px" maxW="2xs" p={6} />
+            <Image src={Logo} alt="Logo" w="360px" maxW="2xs" p={6} />
             <SidebarItems />
           </Box>
           {currentUser?.email && (
@@ -101,8 +101,8 @@ const Sidebar = () => {
               color={textColor}
               noOfLines={2}
               fontSize="sm"
-              p={2}
-              maxW="180px"
+              p={4}
+              maxW="240px"
             >
               Logged in as: {currentUser.email}
             </Text>

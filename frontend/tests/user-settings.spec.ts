@@ -3,13 +3,13 @@ import { firstSuperuser, firstSuperuserPassword } from "./config.ts"
 import { randomEmail, randomPassword } from "./utils/random"
 import { logInUser, logOutUser, signUpNewUser } from "./utils/user"
 
-const tabs = ["My profile", "Password", "Appearance"]
+const tabs = ["Meu Perfil", "Password", "Appearance"]
 
 // User Information
 
-test("My profile tab is active by default", async ({ page }) => {
+test("Meu Perfil tab is active by default", async ({ page }) => {
   await page.goto("/settings")
-  await expect(page.getByRole("tab", { name: "My profile" })).toHaveAttribute(
+  await expect(page.getByRole("tab", { name: "Meu Perfil" })).toHaveAttribute(
     "aria-selected",
     "true",
   )
@@ -38,14 +38,14 @@ test.describe("Edit user full name and email successfully", () => {
     await logInUser(page, email, password)
 
     await page.goto("/settings")
-    await page.getByRole("tab", { name: "My profile" }).click()
+    await page.getByRole("tab", { name: "Meu Perfil" }).click()
     await page.getByRole("button", { name: "Edit" }).click()
     await page.getByLabel("Full name").fill(updatedName)
     await page.getByRole("button", { name: "Save" }).click()
     await expect(page.getByText("User updated successfully")).toBeVisible()
     // Check if the new name is displayed on the page
     await expect(
-      page.getByLabel("My profile").getByText(updatedName, { exact: true }),
+      page.getByLabel("Meu Perfil").getByText(updatedName, { exact: true }),
     ).toBeVisible()
   })
 
@@ -62,13 +62,13 @@ test.describe("Edit user full name and email successfully", () => {
     await logInUser(page, email, password)
 
     await page.goto("/settings")
-    await page.getByRole("tab", { name: "My profile" }).click()
+    await page.getByRole("tab", { name: "Meu Perfil" }).click()
     await page.getByRole("button", { name: "Edit" }).click()
     await page.getByLabel("Email").fill(updatedEmail)
     await page.getByRole("button", { name: "Save" }).click()
     await expect(page.getByText("User updated successfully")).toBeVisible()
     await expect(
-      page.getByLabel("My profile").getByText(updatedEmail, { exact: true }),
+      page.getByLabel("Meu Perfil").getByText(updatedEmail, { exact: true }),
     ).toBeVisible()
   })
 })
@@ -89,7 +89,7 @@ test.describe("Edit user with invalid data", () => {
     await logInUser(page, email, password)
 
     await page.goto("/settings")
-    await page.getByRole("tab", { name: "My profile" }).click()
+    await page.getByRole("tab", { name: "Meu Perfil" }).click()
     await page.getByRole("button", { name: "Edit" }).click()
     await page.getByLabel("Email").fill(invalidEmail)
     await page.locator("body").click()
@@ -109,12 +109,12 @@ test.describe("Edit user with invalid data", () => {
     await logInUser(page, email, password)
 
     await page.goto("/settings")
-    await page.getByRole("tab", { name: "My profile" }).click()
+    await page.getByRole("tab", { name: "Meu Perfil" }).click()
     await page.getByRole("button", { name: "Edit" }).click()
     await page.getByLabel("Full name").fill(updatedName)
     await page.getByRole("button", { name: "Cancel" }).first().click()
     await expect(
-      page.getByLabel("My profile").getByText(fullName, { exact: true }),
+      page.getByLabel("Meu Perfil").getByText(fullName, { exact: true }),
     ).toBeVisible()
   })
 
@@ -131,12 +131,12 @@ test.describe("Edit user with invalid data", () => {
     await logInUser(page, email, password)
 
     await page.goto("/settings")
-    await page.getByRole("tab", { name: "My profile" }).click()
+    await page.getByRole("tab", { name: "Meu Perfil" }).click()
     await page.getByRole("button", { name: "Edit" }).click()
     await page.getByLabel("Email").fill(updatedEmail)
     await page.getByRole("button", { name: "Cancel" }).first().click()
     await expect(
-      page.getByLabel("My profile").getByText(email, { exact: true }),
+      page.getByLabel("Meu Perfil").getByText(email, { exact: true }),
     ).toBeVisible()
   })
 })

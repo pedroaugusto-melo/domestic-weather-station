@@ -23,7 +23,7 @@ const Appearance = () => {
             <Radio value="light" colorScheme="teal">
               Light Mode
               <Badge ml="1" colorScheme="teal">
-                Default
+                PADRÃO
               </Badge>
             </Radio>
             <Radio value="dark" colorScheme="teal">

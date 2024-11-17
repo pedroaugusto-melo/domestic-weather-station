@@ -125,7 +125,7 @@ function Items() {
   return (
     <Container maxW="full">
       <Heading size="lg" textAlign={{ base: "center", md: "left" }} pt={12}>
-        Items Management
+        Análise Inteligente
       </Heading>
 
       <Navbar type={"Item"} addModalAs={AddItem} />
