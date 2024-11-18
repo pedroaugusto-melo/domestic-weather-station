@@ -1,13 +1,15 @@
 import { Box, Flex, Icon, Text, useColorModeValue } from "@chakra-ui/react"
 import { useQueryClient } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
-import { FiBriefcase, FiHome, FiSettings, FiUsers } from "react-icons/fi"
+import { FiSettings } from "react-icons/fi"
+import { AiOutlineLineChart } from "react-icons/ai";
+import { LuBrain } from "react-icons/lu"
 
 import type { UserPublic } from "../../client"
 
 const items = [
-  { icon: FiHome, title: "Dashboard", path: "/" },
-  { icon: FiBriefcase, title: "Análise Inteligente", path: "/items" },
+  { icon: AiOutlineLineChart, title: "Dashboard", path: "/" },
+  { icon: LuBrain, title: "Análise Inteligente", path: "/items" },
   { icon: FiSettings, title: "Configurações de Usuário", path: "/settings" },
 ]
 

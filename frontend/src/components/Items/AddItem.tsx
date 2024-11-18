@@ -71,17 +71,17 @@ const AddItem = ({ isOpen, onClose }: AddItemProps) => {
       >
         <ModalOverlay />
         <ModalContent as="form" onSubmit={handleSubmit(onSubmit)}>
-          <ModalHeader>Add Item</ModalHeader>
+          <ModalHeader>Adicionar Item</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
             <FormControl isRequired isInvalid={!!errors.title}>
-              <FormLabel htmlFor="title">Title</FormLabel>
+              <FormLabel htmlFor="title">Título</FormLabel>
               <Input
                 id="title"
                 {...register("title", {
                   required: "Title is required.",
                 })}
-                placeholder="Title"
+                placeholder="Título"
                 type="text"
               />
               {errors.title && (
@@ -89,11 +89,11 @@ const AddItem = ({ isOpen, onClose }: AddItemProps) => {
               )}
             </FormControl>
             <FormControl mt={4}>
-              <FormLabel htmlFor="description">Description</FormLabel>
+              <FormLabel htmlFor="description">Descrição</FormLabel>
               <Input
                 id="description"
                 {...register("description")}
-                placeholder="Description"
+                placeholder="Descrição"
                 type="text"
               />
             </FormControl>
@@ -101,9 +101,9 @@ const AddItem = ({ isOpen, onClose }: AddItemProps) => {
 
           <ModalFooter gap={3}>
             <Button variant="primary" type="submit" isLoading={isSubmitting}>
-              Save
+              Salvar
             </Button>
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose}>Cancelar</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
