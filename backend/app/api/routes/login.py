@@ -65,7 +65,7 @@ def recover_password(email: str, session: SessionDep) -> Message:
     if not user:
         raise HTTPException(
             status_code=404,
-            detail="The user with this email does not exist in the system.",
+            detail="Esse e-mail não está cadastrado no sistema.",
         )
     password_reset_token = generate_password_reset_token(email=email)
     email_data = generate_reset_password_email(
@@ -76,7 +76,7 @@ def recover_password(email: str, session: SessionDep) -> Message:
         subject=email_data.subject,
         html_content=email_data.html_content,
     )
-    return Message(message="Password recovery email sent")
+    return Message(message="Email de recuperação de senha enviado")
 
 
 @router.post("/reset-password/")
@@ -91,7 +91,7 @@ def reset_password(session: SessionDep, body: NewPassword) -> Message:
     if not user:
         raise HTTPException(
             status_code=404,
-            detail="The user with this email does not exist in the system.",
+            detail="O usuário com esse e-mail não está cadastrado no sistema.",
         )
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -99,7 +99,7 @@ def reset_password(session: SessionDep, body: NewPassword) -> Message:
     user.hashed_password = hashed_password
     session.add(user)
     session.commit()
-    return Message(message="Password updated successfully")
+    return Message(message="Senha atualizada com sucesso")
 
 
 @router.post(
@@ -116,7 +116,7 @@ def recover_password_html_content(email: str, session: SessionDep) -> Any:
     if not user:
         raise HTTPException(
             status_code=404,
-            detail="The user with this username does not exist in the system.",
+            detail="Esse e-mail não está cadastrado no sistema.",
         )
     password_reset_token = generate_password_reset_token(email=email)
     email_data = generate_reset_password_email(
