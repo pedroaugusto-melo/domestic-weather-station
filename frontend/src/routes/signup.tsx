@@ -82,13 +82,13 @@ function SignUp() {
           />
           <FormControl id="full_name" isInvalid={!!errors.full_name}>
             <FormLabel htmlFor="full_name" srOnly>
-              Full Name
+              Nome Completo
             </FormLabel>
             <Input
               id="full_name"
               minLength={3}
               {...register("full_name", { required: "Full Name is required" })}
-              placeholder="Full Name"
+              placeholder="Nome Completo"
               type="text"
             />
             {errors.full_name && (
@@ -114,12 +114,12 @@ function SignUp() {
           </FormControl>
           <FormControl id="password" isInvalid={!!errors.password}>
             <FormLabel htmlFor="password" srOnly>
-              Password
+              Senha
             </FormLabel>
             <Input
               id="password"
               {...register("password", passwordRules())}
-              placeholder="Password"
+              placeholder="Senha"
               type="password"
             />
             {errors.password && (
@@ -131,13 +131,13 @@ function SignUp() {
             isInvalid={!!errors.confirm_password}
           >
             <FormLabel htmlFor="confirm_password" srOnly>
-              Confirm Password
+              Confirme a senha
             </FormLabel>
 
             <Input
               id="confirm_password"
               {...register("confirm_password", confirmPasswordRules(getValues))}
-              placeholder="Repeat Password"
+              placeholder="Confirme a senha"
               type="password"
             />
             {errors.confirm_password && (
@@ -147,10 +147,10 @@ function SignUp() {
             )}
           </FormControl>
           <Button variant="primary" type="submit" isLoading={isSubmitting}>
-            Sign Up
+            Cadastrar
           </Button>
           <Text>
-            Already have an account?{" "}
+            Já tem uma conta?{" "}
             <Link as={RouterLink} to="/login" color="blue.500">
               Log In
             </Link>

@@ -77,16 +77,16 @@ function RecoverPassword() {
       centerContent
     >
       <Heading size="xl" color="ui.main" textAlign="center" mb={2}>
-        Password Recovery
+        Recuperar senha
       </Heading>
       <Text align="center">
-        A password recovery email will be sent to the registered account.
+        Um email de recuperação de senha será enviado para o e-mail cadastrado.
       </Text>
       <FormControl isInvalid={!!errors.email}>
         <Input
           id="email"
           {...register("email", {
-            required: "Email is required",
+            required: "E-mail é necessário",
             pattern: emailPattern,
           })}
           placeholder="Email"
@@ -97,7 +97,7 @@ function RecoverPassword() {
         )}
       </FormControl>
       <Button variant="primary" type="submit" isLoading={isSubmitting}>
-        Continue
+        Continuar
       </Button>
     </Container>
   )

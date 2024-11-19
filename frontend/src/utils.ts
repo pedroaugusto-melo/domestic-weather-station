@@ -2,24 +2,24 @@ import type { ApiError } from "./client"
 
 export const emailPattern = {
   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-  message: "Invalid email address",
+  message: "Endereço de email inválido",
 }
 
 export const namePattern = {
   value: /^[A-Za-z\s\u00C0-\u017F]{1,30}$/,
-  message: "Invalid name",
+  message: "Nome inválido",
 }
 
 export const passwordRules = (isRequired = true) => {
   const rules: any = {
     minLength: {
       value: 8,
-      message: "Password must be at least 8 characters",
+      message: "A senha deve ter pelo menos 8 caracteres",
     },
   }
 
   if (isRequired) {
-    rules.required = "Password is required"
+    rules.required = "Senha é necessária"
   }
 
   return rules
@@ -32,12 +32,12 @@ export const confirmPasswordRules = (
   const rules: any = {
     validate: (value: string) => {
       const password = getValues().password || getValues().new_password
-      return value === password ? true : "The passwords do not match"
+      return value === password ? true : "As senhas não correspondem"
     },
   }
 
   if (isRequired) {
-    rules.required = "Password confirmation is required"
+    rules.required = "É necessário confirmar a senha"
   }
 
   return rules
