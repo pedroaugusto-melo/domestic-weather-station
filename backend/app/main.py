@@ -12,7 +12,7 @@ def custom_generate_unique_id(route: APIRoute) -> str:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    setup_mqtt_client()
+    # setup_mqtt_client()
     yield
 
 app = FastAPI(
