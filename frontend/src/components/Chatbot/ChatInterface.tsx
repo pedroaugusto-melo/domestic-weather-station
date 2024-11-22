@@ -13,13 +13,15 @@ import {
   Avatar,
   Heading,
   Icon,
+  SimpleGrid,
 } from "@chakra-ui/react"
 import { useState, useRef, useEffect } from "react"
 import { useSensorData } from "../../hooks/useSensorData"
 import { useChat } from "../../hooks/useChat"
-import { FiSend } from "react-icons/fi"
+import { FiSend, FiThermometer, FiDroplet, FiAlertTriangle } from "react-icons/fi"
 import { FaRobot } from "react-icons/fa"
 import { FaUserCircle } from "react-icons/fa"
+import { StatCard } from "../Common/StatCard"
 
 interface Message {
   role: "user" | "assistant"
@@ -101,8 +103,30 @@ export function ChatInterface() {
     <Container maxW="container.lg" py={8}>
       <VStack spacing={4} h="80vh">
         <Heading size="lg" alignSelf="flex-start" mb={4}>
-          Chat Assistant
+          Assistente Virtual
         </Heading>
+
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} w="100%" mb={4}>
+          <StatCard
+            title="Temperatura Atual"
+            value={`${sensorData.temperature.current?.value || 0}°C`}
+            icon={FiThermometer}
+            helpText={`Última atualização: ${new Date(sensorData.temperature.current?.timestamp || '').toLocaleTimeString()}`}
+          />
+          <StatCard
+            title="Umidade Atual do Ar"
+            value={`${sensorData.humidity.current?.value || 0}%`}
+            icon={FiDroplet}
+            helpText={`Última atualização: ${new Date(sensorData.humidity.current?.timestamp || '').toLocaleTimeString()}`}
+          />
+          <StatCard
+            title="Nível Atual de Gases Tóxicos"
+            value={`${sensorData.toxicGases.current?.value || 0} ppm`}
+            icon={FiAlertTriangle}
+            helpText={`Última atualização: ${new Date(sensorData.toxicGases.current?.timestamp || '').toLocaleTimeString()}`}
+          />
+        </SimpleGrid>
+
         <Box
           w="100%"
           h="calc(100% - 60px)"
@@ -123,9 +147,9 @@ export function ChatInterface() {
               color="gray.500"
             >
               <Icon as={FaRobot} fontSize="4xl" mb={4} />
-              <Text>Start a conversation with the AI Assistant</Text>
+              <Text>Inicie uma conversa com o Assistente Virtual</Text>
               <Text fontSize="sm">
-                Ask about environmental data and get real-time insights
+                Faça perguntas sobre os dados ambientais e obtenha insights em tempo real
               </Text>
             </Flex>
           ) : (
@@ -185,7 +209,7 @@ export function ChatInterface() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about your environmental data..."
+            placeholder="Pergunte sobre os dados da estação climática..."
             onKeyPress={(e) => e.key === "Enter" && handleSend()}
             isDisabled={isLoading}
             borderRadius="lg"
