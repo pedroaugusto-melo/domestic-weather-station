@@ -1,0 +1,216 @@
+import {
+  Box,
+  VStack,
+  Input,
+  Button,
+  Text,
+  Flex,
+  useColorModeValue,
+  Container,
+  InputGroup,
+  InputRightElement,
+  keyframes,
+  Avatar,
+  Heading,
+  Icon,
+} from "@chakra-ui/react"
+import { useState, useRef, useEffect } from "react"
+import { useSensorData } from "../../hooks/useSensorData"
+import { useChat } from "../../hooks/useChat"
+import { FiSend } from "react-icons/fi"
+import { FaRobot } from "react-icons/fa"
+import { FaUserCircle } from "react-icons/fa"
+
+interface Message {
+  role: "user" | "assistant"
+  content: string
+  isLoading?: boolean
+}
+
+// Create a loading dots animation
+const loadingDots = keyframes`
+  0% { content: "."; }
+  33% { content: ".."; }
+  66% { content: "..."; }
+  100% { content: "."; }
+`
+
+export function ChatInterface() {
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState("")
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  //const { data: sensorData } = useSensorData()
+  // mock data
+  const sensorData = {
+    temperature: { current: { value: 25 } },
+    humidity: { current: { value: 50 } },
+    toxicGases: { current: { value: 10 } },
+  };
+  const { sendMessage, isLoading } = useChat()
+  
+  const bgColor = useColorModeValue("gray.50", "gray.700")
+  const messageBgUser = useColorModeValue("blue.100", "blue.700")
+  const messageBgAssistant = useColorModeValue("gray.100", "gray.600")
+  const borderColor = useColorModeValue("gray.200", "gray.600")
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  const handleSend = async () => {
+    if (!input.trim()) return
+
+    const userMessage: Message = {
+      role: "user",
+      content: input,
+    }
+
+    setMessages(prev => [...prev, userMessage])
+    setInput("")
+
+    // Add loading message
+    const loadingMessage: Message = {
+      role: "assistant",
+      content: "",
+      isLoading: true
+    }
+    setMessages(prev => [...prev, loadingMessage])
+
+    try {
+      const response = await sendMessage(input, sensorData)
+      // Remove loading message and add actual response
+      setMessages(prev => {
+        const withoutLoading = prev.filter(msg => !msg.isLoading)
+        return [...withoutLoading, {
+          role: "assistant",
+          content: response,
+        }]
+      })
+    } catch (error) {
+      // Remove loading message on error
+      setMessages(prev => prev.filter(msg => !msg.isLoading))
+      console.error("Error sending message:", error)
+    }
+  }
+
+  return (
+    <Container maxW="container.lg" py={8}>
+      <VStack spacing={4} h="80vh">
+        <Heading size="lg" alignSelf="flex-start" mb={4}>
+          Chat Assistant
+        </Heading>
+        <Box
+          w="100%"
+          h="calc(100% - 60px)"
+          overflowY="auto"
+          bg={bgColor}
+          p={6}
+          borderRadius="lg"
+          borderWidth="1px"
+          borderColor={borderColor}
+          boxShadow="sm"
+        >
+          {messages.length === 0 ? (
+            <Flex
+              direction="column"
+              align="center"
+              justify="center"
+              h="100%"
+              color="gray.500"
+            >
+              <Icon as={FaRobot} fontSize="4xl" mb={4} />
+              <Text>Start a conversation with the AI Assistant</Text>
+              <Text fontSize="sm">
+                Ask about environmental data and get real-time insights
+              </Text>
+            </Flex>
+          ) : (
+            messages.map((message, index) => (
+              <Flex
+                key={index}
+                justify={message.role === "user" ? "flex-end" : "flex-start"}
+                mb={4}
+                align="start"
+              >
+                {message.role === "assistant" && (
+                  <Avatar
+                    icon={<FaRobot fontSize="1.2rem" />}
+                    bg="blue.500"
+                    color="white"
+                    size="sm"
+                    mr={2}
+                  />
+                )}
+                <Box
+                  maxW="70%"
+                  bg={message.role === "user" ? messageBgUser : messageBgAssistant}
+                  p={4}
+                  borderRadius="lg"
+                  boxShadow="sm"
+                >
+                  {message.isLoading ? (
+                    <Text
+                      as="span"
+                      sx={{
+                        "&::after": {
+                          content: '""',
+                          animation: `${loadingDots} 1s steps(4) infinite`,
+                        },
+                      }}
+                    />
+                  ) : (
+                    <Text whiteSpace="pre-line">{message.content}</Text>
+                  )}
+                </Box>
+                {message.role === "user" && (
+                  <Avatar
+                    icon={<FaUserCircle fontSize="1.2rem" />}
+                    bg="green.500"
+                    color="white"
+                    size="sm"
+                    ml={2}
+                  />
+                )}
+              </Flex>
+            ))
+          )}
+          <div ref={messagesEndRef} />
+        </Box>
+        
+        <InputGroup size="lg">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about your environmental data..."
+            onKeyPress={(e) => e.key === "Enter" && handleSend()}
+            isDisabled={isLoading}
+            borderRadius="lg"
+            pr="5.5rem"
+            _focus={{
+              borderColor: "blue.500",
+              boxShadow: "0 0 0 1px var(--chakra-colors-blue-500)",
+            }}
+          />
+          <InputRightElement width="4.5rem" mr={2}>
+            <Button
+              h="1.75rem"
+              size="sm"
+              onClick={handleSend}
+              isLoading={isLoading}
+              isDisabled={isLoading || !input.trim()}
+              colorScheme="blue"
+              borderRadius="md"
+              leftIcon={<FiSend />}
+            >
+              Send
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+      </VStack>
+    </Container>
+  )
+} 

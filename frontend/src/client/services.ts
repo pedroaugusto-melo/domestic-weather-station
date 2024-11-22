@@ -20,6 +20,8 @@ import type {
   ItemUpdate,
 } from "./models"
 
+import type { AnalysisResponse } from "../types/analysis"
+
 export type TDataLoginAccessToken = {
   formData: Body_login_login_access_token
 }
@@ -525,5 +527,52 @@ export class ItemsService {
         422: `Validation Error`,
       },
     })
+  }
+}
+
+export type ChatMessage = {
+  message: string
+  sensorData: {
+    temperature: number
+    humidity: number
+    toxicGases: number
+  }
+}
+
+export type ChatResponse = {
+  message: string
+}
+
+export class ChatService {
+  /**
+   * Send Chat Message
+   * Send a message to the AI assistant with sensor data context
+   * @returns ChatResponse Successful Response
+   * @throws ApiError
+   */
+  public static sendMessage(data: ChatMessage): CancelablePromise<ChatResponse> {
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/v1/chat",
+      body: data,
+      mediaType: "application/json",
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+}
+
+export class AnalysisService {
+  public static async getAnalysis(temperature: number, humidity: number, toxicGases: number): CancelablePromise<AnalysisResponse> {
+    return __request(OpenAPI, {
+      method: 'GET',
+      url: '/api/v1/analysis/suggestions',
+      query: {
+        temperature,
+        humidity,
+        toxic_gases: toxicGases
+      },
+    });
   }
 }

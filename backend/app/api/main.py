@@ -10,6 +10,8 @@ from app.api.routes import (
     weather_station_models,
     weather_stations,
     weather_station_models_sensors,
+    chat,
+    analysis,
 )
 
 api_router = APIRouter()
@@ -22,3 +24,5 @@ api_router.include_router(weather_stations.router, prefix="/weather-stations", t
 api_router.include_router(weather_station_models_sensors.router, prefix="/weather-station-models-sensors", tags=["weather_station_models_sensors"])
 api_router.include_router(data_readings.router, prefix="/data-readings", tags=["data_readings"])
 api_router.include_router(utils.router, prefix="/utils", tags=["utils"])
+api_router.include_router(chat.router, prefix="/chat", tags=["chat"])
+api_router.include_router(analysis.router, prefix="/analysis", tags=["analysis"])

@@ -92,6 +92,8 @@ class Settings(BaseSettings):
     EMAIL_TEST_USER: str = "test@example.com"
     FIRST_SUPERUSER: str
     FIRST_SUPERUSER_PASSWORD: str
+    OPENAI_API_KEY: str
+    OPENAI_ASSISTANT_ID: str
 
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
