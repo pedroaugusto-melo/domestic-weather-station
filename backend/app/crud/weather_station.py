@@ -49,3 +49,13 @@ def delete_weather_station(
     session.delete(weather_station)
     session.commit()
     return weather_station
+
+
+def get_weather_stations(*, session: Session, skip: int = 0, limit: int = 100) -> list[WeatherStation]:
+    statement = select(WeatherStation).offset(skip).limit(limit)
+    return session.exec(statement).all()
+
+
+def get_user_weather_stations(*, session: Session, user_id: uuid.UUID, skip: int = 0, limit: int = 100) -> list[WeatherStation]:
+    statement = select(WeatherStation).where(WeatherStation.user_id == user_id).offset(skip).limit(limit)
+    return session.exec(statement).all()

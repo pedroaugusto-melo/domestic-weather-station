@@ -58,3 +58,11 @@ def delete_weather_station(session: Session, id: uuid.UUID) -> WeatherStation | 
         return None
 
     return crud.delete_weather_station(session=session, weather_station=weather_station)
+
+
+def get_weather_stations(session: Session, skip: int = 0, limit: int = 100) -> list[WeatherStation]:
+    return crud.get_weather_stations(session=session, skip=skip, limit=limit)
+
+
+def get_user_weather_stations(session: Session, user_id: uuid.UUID, skip: int = 0, limit: int = 100) -> list[WeatherStation]:
+    return crud.get_user_weather_stations(session=session, user_id=user_id, skip=skip, limit=limit)

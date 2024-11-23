@@ -1,11 +1,12 @@
 import uuid
-from typing import Any
+from typing import Any, Annotated
 from sqlalchemy.exc import IntegrityError
 
 from fastapi import APIRouter, HTTPException, Depends
 
 from app.api.deps.db import SessionDep
 import app.api.deps.weather_station as deps
+from app.api.deps.user import get_current_user, CurrentUser
 
 from app.models.weather_station import (
     WeatherStationCreate,
@@ -85,3 +86,27 @@ def delete_weather_station(
         raise HTTPException(status_code=404, detail="Weather Station not found")
     
     return Message(message="Weather Station deleted successfully")
+
+
+@router.get("/", response_model=list[WeatherStationPublic])
+def list_weather_stations(
+    session: SessionDep,
+    current_user: Annotated[CurrentUser, Depends(get_current_user)],
+    skip: int = 0,
+    limit: int = 100,
+) -> Any:
+    """
+    Get list of weather stations.
+    For regular users: returns only their weather stations
+    For superusers: returns all weather stations
+    """
+    if current_user.is_superuser:
+        weather_stations = service.get_weather_stations(
+            session=session, skip=skip, limit=limit
+        )
+    else:
+        weather_stations = service.get_user_weather_stations(
+            session=session, user_id=current_user.id, skip=skip, limit=limit
+        )
+    
+    return weather_stations
