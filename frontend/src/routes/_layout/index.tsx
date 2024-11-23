@@ -78,7 +78,7 @@ function Dashboard() {
 
   if (isLoading) {
     return (
-      <Center h="100vh">
+      <Center w="100%">
         <Spinner size="xl" />
       </Center>
     );
