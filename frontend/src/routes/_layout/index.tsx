@@ -23,8 +23,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { TimeRangeSelector } from "../../components/TimeRangeSelector"
-import { useState } from "react"
+import { TimeRangeSelector } from "../../components/TimeRangeSelector";
+import { useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { useSensorData } from "../../hooks/useSensorData";
 import { StatCard } from "../../components/Common/StatCard";
@@ -79,6 +79,13 @@ function Dashboard() {
   const { data: sensorData, isLoading, error } = useSensorData(5000, timeRange);
   const { user: currentUser } = useAuth();
 
+  const formatXAxisTimeStampLabel = (timestamp: number) => {
+    const date = new Date(timestamp);
+
+    if (timeRange <= 24 * 60) return date.toLocaleTimeString();
+    return date.toLocaleDateString();
+  };
+
   if (isLoading) {
     return (
       <Center w="100%">
@@ -97,7 +104,7 @@ function Dashboard() {
 
   return (
     <Container maxW="full">
-      <Box pt={8} px={4}>
+      <Box pt={8} px={4} mt={10}>
         <Flex justify="space-between" align="center" mb={6}>
           <Text fontSize="2xl">
             Olá, {currentUser?.full_name || currentUser?.email} 👋🏼
@@ -139,14 +146,14 @@ function Dashboard() {
                     <XAxis
                       dataKey="timestamp"
                       tickFormatter={(timestamp) =>
-                        new Date(timestamp).toLocaleTimeString()
+                        formatXAxisTimeStampLabel(timestamp)
                       }
                     />
                     <YAxis yAxisId="left" name="Temperatura" />
                     <YAxis yAxisId="right" orientation="right" name="Umidade" />
                     <Tooltip
                       labelFormatter={(timestamp) =>
-                        new Date(timestamp).toLocaleString()
+                        formatXAxisTimeStampLabel(timestamp)
                       }
                     />
                     <Legend />
@@ -206,13 +213,13 @@ function Dashboard() {
                     <XAxis
                       dataKey="timestamp"
                       tickFormatter={(timestamp) =>
-                        new Date(timestamp).toLocaleTimeString()
+                        formatXAxisTimeStampLabel(timestamp)
                       }
                     />
                     <YAxis />
                     <Tooltip
                       labelFormatter={(timestamp) =>
-                        new Date(timestamp).toLocaleString()
+                        formatXAxisTimeStampLabel(timestamp)
                       }
                     />
                     <Legend />
