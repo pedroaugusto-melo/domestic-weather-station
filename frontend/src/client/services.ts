@@ -576,3 +576,94 @@ export class AnalysisService {
     });
   }
 }
+
+export type DataReading = {
+  id: string
+  weather_station_id: string
+  value: number
+  read_at: string
+}
+
+export type ReadingType = 'temperature' | 'humidity' | 'gas_level'
+
+export type WeatherStation = {
+  id: string
+  user_id: string
+  weather_station_model_id: string
+  name: string
+  description: string | null
+  part_number: string
+}
+
+export class ReadingsService {
+  /**
+   * Get Current Readings
+   * Get the latest readings for a weather station
+   * @returns DataReading[] Successful Response
+   * @throws ApiError
+   */
+  public static getCurrentReadings(
+    weatherStationId: string,
+    type: ReadingType,
+    limit: number = 1
+  ): CancelablePromise<DataReading[]> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: `/api/v1/data-readings/weather-stations/${weatherStationId}`,
+      query: {
+        type,
+        limit,
+        order: 'desc',
+        order_by: 'read_at'
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+
+  /**
+   * Get Historical Readings
+   * Get historical readings for a weather station
+   * @returns DataReading[] Successful Response
+   * @throws ApiError
+   */
+  public static getHistoricalReadings(
+    weatherStationId: string,
+    type: ReadingType,
+    minutes: number = 60,
+    skip: number = 0,
+    limit: number = 1000000
+  ): CancelablePromise<DataReading[]> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: `/api/v1/data-readings/weather-stations/${weatherStationId}`,
+      query: {
+        type,
+        minutes,
+        skip,
+        limit,
+      },
+      errors: {
+        422: `Validation Error`,
+      },
+    })
+  }
+
+  /**
+   * Get Weather Stations
+   * Get list of weather stations for the current user
+   * @returns WeatherStation[] Successful Response
+   * @throws ApiError
+   */
+  public static getWeatherStations(): CancelablePromise<WeatherStation[]> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/weather-stations",
+      errors: {
+        422: `Validation Error`,
+        403: `Not enough permissions`,
+      },
+    })
+  }
+}
