@@ -643,6 +643,8 @@ export class ReadingsService {
         minutes,
         skip,
         limit,
+        order: 'asc',
+        order_by: 'read_at'
       },
       errors: {
         422: `Validation Error`,
