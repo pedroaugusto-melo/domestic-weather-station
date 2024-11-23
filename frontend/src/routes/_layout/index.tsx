@@ -26,6 +26,8 @@ import {
 import useAuth from "../../hooks/useAuth"
 import { useSensorData } from '../../hooks/useSensorData'
 import { StatCard } from "../../components/Common/StatCard"
+import { TimeRangeSelector } from "../../components/TimeRangeSelector"
+import { useState } from "react"
 
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
@@ -66,7 +68,8 @@ function StatsInfoCard({ title, stats }: StatsProps) {
 
 function Dashboard() {
   const { user: currentUser } = useAuth()
-  const { data: sensorData, isLoading, error } = useSensorData(5000)
+  const [timeRange, setTimeRange] = useState(5)
+  const { data: sensorData, isLoading, error } = useSensorData(5000, timeRange)
 
   if (isLoading) {
     return (
@@ -87,9 +90,12 @@ function Dashboard() {
   return (
     <Container maxW="full">
       <Box pt={8} px={4}>
-        <Text fontSize="2xl" mb={6}>
-          Olá, {currentUser?.full_name || currentUser?.email} 👋🏼
-        </Text>
+        <Flex justify="space-between" align="center" mb={6}>
+          <Text fontSize="2xl">
+            Olá, {currentUser?.full_name || currentUser?.email} 👋🏼
+          </Text>
+          <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
+        </Flex>
 
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} mb={8}>
           <StatCard
@@ -121,8 +127,8 @@ function Dashboard() {
                   <LineChart data={sensorData.history}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis 
-                      dataKey="read_at"
-                      tickFormatter={(timestamp) => new Date(timestamp).toLocaleTimeString()}
+                      dataKey="timestamp"
+                      tickFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
                     />
                     <YAxis yAxisId="left" name="Temperatura" />
                     <YAxis yAxisId="right" orientation="right" name="Umidade" />
@@ -182,8 +188,8 @@ function Dashboard() {
                   <LineChart data={sensorData.history}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis 
-                      dataKey="read_at"
-                      tickFormatter={(timestamp) => new Date(timestamp).toLocaleTimeString()}
+                      dataKey="timestamp"
+                      tickFormatter={(timestamp) => new Date(timestamp).toLocaleDateString()}
                     />
                     <YAxis />
                     <Tooltip 

@@ -34,9 +34,9 @@ interface SensorData {
   }[]
 }
 
-export function useSensorData(refetchInterval = 5000) {
+export function useSensorData(refetchInterval = 5000, timeRange = 4*24*60) {
   return useQuery<SensorData>({
-    queryKey: ['sensorData'],
+    queryKey: ['sensorData', timeRange],
     queryFn: async () => {
       // Get the first weather station's ID
       const weatherStations = await ReadingsService.getWeatherStations()
@@ -54,9 +54,9 @@ export function useSensorData(refetchInterval = 5000) {
       ])
 
       const [tempHistory, humidityHistory, gasHistory] = await Promise.all([
-        ReadingsService.getHistoricalReadings(weatherStationId, 'temperature', 4*24*60),
-        ReadingsService.getHistoricalReadings(weatherStationId, 'humidity', 4*24*60),
-        ReadingsService.getHistoricalReadings(weatherStationId, 'gas_level', 4*24*60)
+        ReadingsService.getHistoricalReadings(weatherStationId, 'temperature', timeRange),
+        ReadingsService.getHistoricalReadings(weatherStationId, 'humidity', timeRange),
+        ReadingsService.getHistoricalReadings(weatherStationId, 'gas_level', timeRange)
       ])
 
       // Process historical data
