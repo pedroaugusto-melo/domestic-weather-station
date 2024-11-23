@@ -34,13 +34,35 @@ def read_data_reading(session: SessionDep, id: uuid.UUID, type: ReadingTypes) ->
 
 
 @router.get("/weather-stations/{id}", response_model=list[DataReadingPublicTypes], dependencies=[Depends(deps.authorize_read_weather_station_data_readings)])
-def read_weather_station_data_readings(session: SessionDep, id: uuid.UUID, type: ReadingTypes, skip: int = 0, limit: int = 1000) -> Any:
+def read_weather_station_data_readings(
+    session: SessionDep, 
+    id: uuid.UUID, 
+    type: ReadingTypes, 
+    minutes: int | None = None,
+    skip: int = 0, 
+    limit: int = 1000,
+    order: str = 'desc',
+    order_by: str = 'read_at'
+) -> Any:
     """
     Get data readings by Weather Station ID.
+    
+    Parameters:
+    - minutes: Get readings from the last N minutes
+    - skip: Number of records to skip
+    - limit: Maximum number of records to return
+    - order: Sort order ('asc' or 'desc')
+    - order_by: Field to sort by
     """
-
     data_readings = service.get_data_readings_by_weather_station_id(
-        session=session, weather_station_id=id, skip=skip, limit=limit, reading_type=type
+        session=session, 
+        weather_station_id=id, 
+        minutes=minutes,
+        skip=skip, 
+        limit=limit, 
+        reading_type=type,
+        order=order,
+        order_by=order_by
     )
 
     return data_readings

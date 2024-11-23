@@ -19,8 +19,26 @@ def get_data_reading_by_id(session: Session, id: uuid.UUID, reading_type: Readin
     return crud.get_data_reading_by_id(session=session, data_reading_id=id, reading_type=reading_type)
 
 
-def get_data_readings_by_weather_station_id(session: Session, weather_station_id: uuid.UUID, reading_type: ReadingTypes, skip: int = 0, limit: int = 1000) -> list[DataReadingTypesClasses]:
-    return crud.get_data_readings_by_weather_station_id(session=session, weather_station_id=weather_station_id, skip=skip, limit=limit, reading_type=reading_type)
+def get_data_readings_by_weather_station_id(
+    session: Session, 
+    weather_station_id: uuid.UUID, 
+    reading_type: ReadingTypes, 
+    minutes: int = 60,
+    skip: int = 0, 
+    limit: int = 1000,
+    order: str = 'desc',
+    order_by: str = 'read_at'
+) -> list[DataReadingTypesClasses]:
+    return crud.get_data_readings_by_weather_station_id(
+        session=session, 
+        weather_station_id=weather_station_id, 
+        minutes=minutes,
+        skip=skip, 
+        limit=limit, 
+        reading_type=reading_type,
+        order=order,
+        order_by=order_by
+    )
 
 
 def create_data_reading(session: Session, data_reading_in: DataReadingCreateTypesClasses, reading_type: ReadingTypes) -> DataReadingTypesClasses | None:

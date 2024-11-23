@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timedelta, UTC
 from sqlmodel import Session, select
 
 from app.constants.data_reading_types import ReadingTypes
@@ -39,10 +40,45 @@ def get_data_reading_by_id(
 
 
 def get_data_readings_by_weather_station_id(
-    *, session: Session, weather_station_id: uuid.UUID, skip: int = 0, limit: int = 1000, reading_type: ReadingTypes
+    *, 
+    session: Session, 
+    weather_station_id: uuid.UUID, 
+    minutes: int | None = None,
+    skip: int = 0, 
+    limit: int = 1000, 
+    reading_type: ReadingTypes,
+    order: str = 'desc',
+    order_by: str = 'read_at'
 ) -> list[DataReadingTypesClasses]:
     ReadingClass = ReadingClassesByType[reading_type]
-    statement = select(ReadingClass).where(ReadingClass.weather_station_id == weather_station_id).offset(skip).limit(limit)
+    
+    # Get the column to order by
+    order_column = getattr(ReadingClass, order_by)
+    
+    # Apply ordering
+    if order.lower() == 'desc':
+        order_column = order_column.desc()
+    else:
+        order_column = order_column.asc()
+    
+    # Start building the base query
+    statement = (
+        select(ReadingClass)
+        .where(ReadingClass.weather_station_id == weather_station_id)
+    )
+    
+    # Add time filter only if minutes parameter is provided
+    if minutes is not None:
+        time_threshold = datetime.now(UTC) - timedelta(minutes=minutes)
+        statement = statement.where(ReadingClass.read_at >= time_threshold)
+    
+    # Add ordering, offset and limit
+    statement = (
+        statement
+        .order_by(order_column)
+        .offset(skip)
+        .limit(limit)
+    )
 
     return session.exec(statement).all()
 
