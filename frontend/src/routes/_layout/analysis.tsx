@@ -30,14 +30,7 @@ export const Route = createFileRoute("/_layout/analysis")({
 
 function Analysis() {
   const queryClient = useQueryClient();
-  // const { data: sensorData, isLoading: isSensorDataLoading } = useSensorData();
-  // mock data
-  const sensorData = {
-    temperature: { current: { value: 25 } },
-    humidity: { current: { value: 50 } },
-    toxicGases: { current: { value: 1 } },
-  };
-  const isSensorDataLoading = false;
+  const { data: sensorData, isLoading: isSensorDataLoading } = useSensorData(0);
   const cardBg = useColorModeValue("white", "gray.800");
 
   const { 
@@ -46,19 +39,25 @@ function Analysis() {
     refetch,
     isFetching 
   } = useQuery({
-    queryKey: ["analysis", sensorData?.temperature?.current?.value],
+    queryKey: ["analysis", 
+      sensorData?.temperature.current?.value,
+      sensorData?.humidity.current?.value,
+      sensorData?.toxicGases.current?.value
+    ],
     queryFn: () =>
       AnalysisService.getAnalysis(
-        sensorData?.temperature?.current?.value || 0,
-        sensorData?.humidity?.current?.value || 0,
-        sensorData?.toxicGases?.current?.value || 0
+        sensorData?.temperature.current?.value || 0,
+        sensorData?.humidity.current?.value || 0,
+        sensorData?.toxicGases.current?.value || 0
       ),
-    enabled: !!sensorData,
+    enabled: !!sensorData?.temperature.current?.value,
+    refetchInterval: undefined,
+    refetchOnWindowFocus: false,
   });
 
   const handleRefresh = async () => {
     await queryClient.invalidateQueries({ queryKey: ["sensorData"] });
-    refetch();
+    await refetch();
   };
 
   if (isSensorDataLoading || isAnalysisLoading) {
@@ -73,40 +72,10 @@ function Analysis() {
           >
             Atualizar Análise
           </Button>
-
-          <Skeleton height="36px" width="250px" />
-
-          {/* Sensor Cards Skeleton */}
-          <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-            {[1, 2, 3].map((index) => (
-              <Card key={index} bg={cardBg}>
-                <CardBody>
-                  <Flex justify="space-between" align="center">
-                    <Box flex="1">
-                      <Skeleton height="16px" width="120px" mb={2} />
-                      <Skeleton height="24px" width="80px" mb={2} />
-                      <Skeleton height="14px" width="140px" />
-                    </Box>
-                    <Skeleton height="32px" width="32px" borderRadius="md" />
-                  </Flex>
-                </CardBody>
-              </Card>
-            ))}
-          </SimpleGrid>
-
-          {/* Analysis Section Skeleton */}
-          <SkeletonText noOfLines={2} spacing="4" skeletonHeight="4" />
-
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-            {[1, 2, 3, 4].map((index) => (
-              <Card key={index} bg={cardBg}>
-                <CardBody>
-                  <Skeleton height="24px" width="200px" mb={4} />
-                  <SkeletonText noOfLines={3} spacing="4" skeletonHeight="3" />
-                </CardBody>
-              </Card>
-            ))}
-          </SimpleGrid>
+          <Heading size="lg">Análise Inteligente</Heading>
+          <Center p={8}>
+            <Spinner size="xl" />
+          </Center>
         </VStack>
       </Container>
     );
@@ -120,10 +89,9 @@ function Analysis() {
         <Button
           leftIcon={<Icon as={FiRefreshCw} />}
           onClick={handleRefresh}
+          isLoading={isFetching}
           alignSelf="flex-end"
           colorScheme="blue"
-          isLoading={isFetching}
-          loadingText="Atualizando..."
         >
           Atualizar Análise
         </Button>
@@ -133,21 +101,21 @@ function Analysis() {
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
           <StatCard
             title="Temperatura Atual"
-            value={`${sensorData.temperature.current?.value || 0}°C`}
+            value={`${sensorData?.temperature.current?.value || 0}°C`}
             icon={FiThermometer}
-            helpText={`Última atualização: ${new Date(sensorData.temperature.current?.timestamp || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.temperature.current?.read_at || '').toLocaleTimeString()}`}
           />
           <StatCard
             title="Umidade Atual do Ar"
-            value={`${sensorData.humidity.current?.value || 0}%`}
+            value={`${sensorData?.humidity.current?.value || 0}%`}
             icon={FiDroplet}
-            helpText={`Última atualização: ${new Date(sensorData.humidity.current?.timestamp || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.humidity.current?.read_at || '').toLocaleTimeString()}`}
           />
           <StatCard
             title="Nível Atual de Gases Tóxicos"
-            value={`${sensorData.toxicGases.current?.value || 0} ppm`}
+            value={`${sensorData?.toxicGases.current?.value || 0} ppm`}
             icon={FiAlertTriangle}
-            helpText={`Última atualização: ${new Date(sensorData.toxicGases.current?.timestamp || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.toxicGases.current?.read_at || '').toLocaleTimeString()}`}
           />
         </SimpleGrid>
 
