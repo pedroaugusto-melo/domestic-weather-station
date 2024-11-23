@@ -14,6 +14,7 @@ import {
   Heading,
   Icon,
   SimpleGrid,
+  Spinner,
 } from "@chakra-ui/react"
 import { useState, useRef, useEffect } from "react"
 import { useSensorData } from "../../hooks/useSensorData"
@@ -41,14 +42,8 @@ export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  //const { data: sensorData } = useSensorData()
-  // mock data
-  const sensorData = {
-    temperature: { current: { value: 25 } },
-    humidity: { current: { value: 50 } },
-    toxicGases: { current: { value: 10 } },
-  };
-  const { sendMessage, isLoading } = useChat()
+  const { data: sensorData, isLoading: isSensorDataLoading, error: sensorError } = useSensorData(5000)
+  const { sendMessage, isLoading: isChatLoading } = useChat()
   
   const bgColor = useColorModeValue("gray.50", "gray.700")
   const messageBgUser = useColorModeValue("blue.100", "blue.700")
@@ -64,7 +59,7 @@ export function ChatInterface() {
   }, [messages])
 
   const handleSend = async () => {
-    if (!input.trim()) return
+    if (!input.trim() || !sensorData) return
 
     const userMessage: Message = {
       role: "user",
@@ -83,7 +78,11 @@ export function ChatInterface() {
     setMessages(prev => [...prev, loadingMessage])
 
     try {
-      const response = await sendMessage(input, sensorData)
+      const response = await sendMessage(input, {
+        temperature: Number(sensorData.temperature.current?.value ?? 0),
+        humidity: Number(sensorData.humidity.current?.value ?? 0),
+        toxicGases: Number(sensorData.toxicGases.current?.value ?? 0),
+      })
       // Remove loading message and add actual response
       setMessages(prev => {
         const withoutLoading = prev.filter(msg => !msg.isLoading)
@@ -99,6 +98,36 @@ export function ChatInterface() {
     }
   }
 
+  if (isSensorDataLoading) {
+    return (
+      <Container maxW="container.lg" py={8}>
+        <VStack spacing={4} h="80vh">
+          <Heading size="lg" alignSelf="flex-start" mb={4}>
+            Assistente Virtual
+          </Heading>
+          <Flex justify="center" align="center" h="100%">
+            <Spinner size="xl" />
+          </Flex>
+        </VStack>
+      </Container>
+    )
+  }
+
+  if (sensorError) {
+    return (
+      <Container maxW="container.lg" py={8}>
+        <VStack spacing={4} h="80vh">
+          <Heading size="lg" alignSelf="flex-start" mb={4}>
+            Assistente Virtual
+          </Heading>
+          <Flex justify="center" align="center" h="100%" color="red.500">
+            <Text>Error loading sensor data. Please try again later.</Text>
+          </Flex>
+        </VStack>
+      </Container>
+    )
+  }
+
   return (
     <Container maxW="container.lg" py={8}>
       <VStack spacing={4} h="80vh">
@@ -109,21 +138,21 @@ export function ChatInterface() {
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6} w="100%" mb={4}>
           <StatCard
             title="Temperatura Atual"
-            value={`${sensorData.temperature.current?.value || 0}°C`}
+            value={`${sensorData?.temperature.current?.value || 0}°C`}
             icon={FiThermometer}
-            helpText={`Última atualização: ${new Date(sensorData.temperature.current?.timestamp || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.temperature.current?.read_at || '').toLocaleTimeString()}`}
           />
           <StatCard
             title="Umidade Atual do Ar"
-            value={`${sensorData.humidity.current?.value || 0}%`}
+            value={`${sensorData?.humidity.current?.value || 0}%`}
             icon={FiDroplet}
-            helpText={`Última atualização: ${new Date(sensorData.humidity.current?.timestamp || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.humidity.current?.read_at || '').toLocaleTimeString()}`}
           />
           <StatCard
             title="Nível Atual de Gases Tóxicos"
-            value={`${sensorData.toxicGases.current?.value || 0} ppm`}
+            value={`${sensorData?.toxicGases.current?.value || 0} ppm`}
             icon={FiAlertTriangle}
-            helpText={`Última atualização: ${new Date(sensorData.toxicGases.current?.timestamp || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.toxicGases.current?.read_at || '').toLocaleTimeString()}`}
           />
         </SimpleGrid>
 
@@ -211,7 +240,7 @@ export function ChatInterface() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Pergunte sobre os dados da estação climática..."
             onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            isDisabled={isLoading}
+            isDisabled={isChatLoading}
             borderRadius="lg"
             pr="5.5rem"
             _focus={{
@@ -224,8 +253,8 @@ export function ChatInterface() {
               h="1.75rem"
               size="sm"
               onClick={handleSend}
-              isLoading={isLoading}
-              isDisabled={isLoading || !input.trim()}
+              isLoading={isChatLoading}
+              isDisabled={isChatLoading || !input.trim() || !sensorData}
               colorScheme="blue"
               borderRadius="md"
               leftIcon={<FiSend />}
