@@ -1,12 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
-
-interface DataReading {
-  id: string
-  weather_station_id: string
-  value: number
-  timestamp: string
-}
+import { ReadingsService, DataReading } from '../client/services'
 
 interface SensorData {
   temperature: {
@@ -41,51 +34,67 @@ interface SensorData {
   }[]
 }
 
-export function useSensorData() {
+export function useSensorData(refetchInterval = 5000) {
   return useQuery<SensorData>({
     queryKey: ['sensorData'],
     queryFn: async () => {
+      // Get the first weather station's ID
+      const weatherStations = await ReadingsService.getWeatherStations()
+      const weatherStationId = weatherStations[0]?.id
+
+      if (!weatherStationId) {
+        throw new Error('No weather station found')
+      }
+
       // Fetch current readings
       const [tempData, humidityData, gasesData] = await Promise.all([
-        axios.get('/api/readings?type=temperature&limit=1'),
-        axios.get('/api/readings?type=humidity&limit=1'),
-        axios.get('/api/readings?type=toxic_gases&limit=1')
+        ReadingsService.getCurrentReadings(weatherStationId, 'temperature'),
+        ReadingsService.getCurrentReadings(weatherStationId, 'humidity'),
+        ReadingsService.getCurrentReadings(weatherStationId, 'gas_level')
       ])
 
-      // Fetch historical data for charts
-      const history = await axios.get('/api/readings/history')
-      const processedHistory = Array.isArray(history.data) ? history.data : [];
+      const [tempHistory, humidityHistory, gasHistory] = await Promise.all([
+        ReadingsService.getHistoricalReadings(weatherStationId, 'temperature', 4*24*60),
+        ReadingsService.getHistoricalReadings(weatherStationId, 'humidity', 4*24*60),
+        ReadingsService.getHistoricalReadings(weatherStationId, 'gas_level', 4*24*60)
+      ])
 
-      // Calculate stats from historical data
-      const calculateStats = (dataKey: 'temperature' | 'humidity' | 'toxicGases') => {
-        const values = processedHistory.map(entry => entry[dataKey]);
+      // Process historical data
+      const history = tempHistory.map((temp, index) => ({
+        timestamp: temp.read_at,
+        temperature: temp.value,
+        humidity: humidityHistory[index]?.value || 0,
+        toxicGases: gasHistory[index]?.value || 0
+      }))
+
+      // Calculate stats
+      const calculateStats = (data: DataReading[]) => {
+        const values = data.map(reading => reading.value)
         return {
           avg: values.reduce((sum, val) => sum + val, 0) / values.length || 0,
           max: Math.max(...values, 0),
           min: Math.min(...values, 0)
-        };
-      };
-
-      const temperatureStats = calculateStats('temperature');
-      const humidityStats = calculateStats('humidity');
-      const toxicGasesStats = calculateStats('toxicGases');
+        }
+      }
 
       return {
         temperature: {
-          current: tempData.data[0],
-          stats: temperatureStats
+          current: tempData[0],
+          stats: calculateStats(tempHistory)
         },
         humidity: {
-          current: humidityData.data[0],
-          stats: humidityStats
+          current: humidityData[0],
+          stats: calculateStats(humidityHistory)
         },
         toxicGases: {
-          current: gasesData.data[0],
-          stats: toxicGasesStats
+          current: gasesData[0],
+          stats: calculateStats(gasHistory)
         },
-        history: processedHistory
+        history
       }
     },
-    refetchInterval: 30000,
+    refetchInterval,
+    refetchIntervalInBackground: true,
+    staleTime: refetchInterval,
   })
 } 
