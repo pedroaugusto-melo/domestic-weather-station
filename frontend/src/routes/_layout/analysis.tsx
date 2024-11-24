@@ -8,16 +8,16 @@ import {
   SimpleGrid,
   Button,
   Icon,
-  useColorModeValue,
   Spinner,
   Center,
-  Skeleton,
-  SkeletonText,
-  Flex,
-  Box,
 } from "@chakra-ui/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { FiRefreshCw, FiThermometer, FiDroplet, FiAlertTriangle } from "react-icons/fi";
+import {
+  FiRefreshCw,
+  FiThermometer,
+  FiDroplet,
+  FiAlertTriangle,
+} from "react-icons/fi";
 import { useSensorData } from "../../hooks/useSensorData";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Suggestion } from "../../types/analysis";
@@ -31,18 +31,18 @@ export const Route = createFileRoute("/_layout/analysis")({
 function Analysis() {
   const queryClient = useQueryClient();
   const { data: sensorData, isLoading: isSensorDataLoading } = useSensorData(0);
-  const cardBg = useColorModeValue("white", "gray.800");
 
-  const { 
-    data: analysisData, 
-    isLoading: isAnalysisLoading, 
+  const {
+    data: analysisData,
+    isLoading: isAnalysisLoading,
     refetch,
-    isFetching 
+    isFetching,
   } = useQuery({
-    queryKey: ["analysis", 
+    queryKey: [
+      "analysis",
       sensorData?.temperature.current?.value,
       sensorData?.humidity.current?.value,
-      sensorData?.toxicGases.current?.value
+      sensorData?.toxicGases.current?.value,
     ],
     queryFn: () =>
       AnalysisService.getAnalysis(
@@ -103,30 +103,30 @@ function Analysis() {
             title="Temperatura Atual"
             value={`${sensorData?.temperature.current?.value || 0}°C`}
             icon={FiThermometer}
-            helpText={`Última atualização: ${new Date(sensorData?.temperature.current?.read_at || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.temperature.current?.read_at || "").toLocaleTimeString()}`}
           />
           <StatCard
             title="Umidade Atual do Ar"
             value={`${sensorData?.humidity.current?.value || 0}%`}
             icon={FiDroplet}
-            helpText={`Última atualização: ${new Date(sensorData?.humidity.current?.read_at || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.humidity.current?.read_at || "").toLocaleTimeString()}`}
           />
           <StatCard
             title="Nível Atual de Gases Tóxicos"
             value={`${sensorData?.toxicGases.current?.value || 0} ppm`}
             icon={FiAlertTriangle}
-            helpText={`Última atualização: ${new Date(sensorData?.toxicGases.current?.read_at || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.toxicGases.current?.read_at || "").toLocaleTimeString()}`}
           />
         </SimpleGrid>
 
         <Text>
-          Com base nas leituras atuais, nossa IA gerou as seguintes sugestões para
-          melhorar seu conforto e segurança:
+          Com base nas leituras atuais, nossa IA gerou as seguintes sugestões
+          para melhorar seu conforto e segurança:
         </Text>
 
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
           {suggestions.map((suggestion: Suggestion, index: number) => (
-            <Card key={index} bg={cardBg}>
+            <Card key={index}>
               <CardBody>
                 <Heading size="md" mb={2}>
                   {suggestion.title}

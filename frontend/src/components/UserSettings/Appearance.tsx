@@ -6,10 +6,10 @@ import {
   RadioGroup,
   Stack,
   useColorMode,
-} from "@chakra-ui/react"
+} from "@chakra-ui/react";
 
 const Appearance = () => {
-  const { colorMode, toggleColorMode } = useColorMode()
+  const { colorMode, toggleColorMode } = useColorMode();
 
   return (
     <>
@@ -19,20 +19,19 @@ const Appearance = () => {
         </Heading>
         <RadioGroup onChange={toggleColorMode} value={colorMode}>
           <Stack>
-            {/* TODO: Add system default option */}
-            <Radio value="light" colorScheme="teal">
-              Light Mode
+            <Radio value="dark" colorScheme="teal">
+              Dark Mode
               <Badge ml="1" colorScheme="teal">
                 PADRÃO
               </Badge>
             </Radio>
-            <Radio value="dark" colorScheme="teal">
-              Dark Mode
+            <Radio value="light" colorScheme="teal">
+              Light Mode
             </Radio>
           </Stack>
         </RadioGroup>
       </Container>
     </>
-  )
-}
-export default Appearance
+  );
+};
+export default Appearance;
