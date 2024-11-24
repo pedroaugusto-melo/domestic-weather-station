@@ -15,19 +15,24 @@ import {
   Icon,
   SimpleGrid,
   Spinner,
-} from "@chakra-ui/react"
-import { useState, useRef, useEffect } from "react"
-import { useSensorData } from "../../hooks/useSensorData"
-import { useChat } from "../../hooks/useChat"
-import { FiSend, FiThermometer, FiDroplet, FiAlertTriangle } from "react-icons/fi"
-import { FaRobot } from "react-icons/fa"
-import { FaUserCircle } from "react-icons/fa"
-import { StatCard } from "../Common/StatCard"
+} from "@chakra-ui/react";
+import { useState, useRef, useEffect } from "react";
+import { useSensorData } from "../../hooks/useSensorData";
+import { useChat } from "../../hooks/useChat";
+import {
+  FiSend,
+  FiThermometer,
+  FiDroplet,
+  FiAlertTriangle,
+} from "react-icons/fi";
+import { FaRobot } from "react-icons/fa";
+import { FaUserCircle } from "react-icons/fa";
+import { StatCard } from "../Common/StatCard";
 
 interface Message {
-  role: "user" | "assistant"
-  content: string
-  isLoading?: boolean
+  role: "user" | "assistant";
+  content: string;
+  isLoading?: boolean;
 }
 
 // Create a loading dots animation
@@ -36,71 +41,78 @@ const loadingDots = keyframes`
   33% { content: ".."; }
   66% { content: "..."; }
   100% { content: "."; }
-`
+`;
 
 export function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState("")
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { data: sensorData, isLoading: isSensorDataLoading, error: sensorError } = useSensorData(5000)
-  const { sendMessage, isLoading: isChatLoading } = useChat()
-  
-  const bgColor = useColorModeValue("gray.50", "gray.700")
-  const messageBgUser = useColorModeValue("blue.100", "blue.700")
-  const messageBgAssistant = useColorModeValue("gray.100", "gray.600")
-  const borderColor = useColorModeValue("gray.200", "gray.600")
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const {
+    data: sensorData,
+    isLoading: isSensorDataLoading,
+    error: sensorError,
+  } = useSensorData(5000);
+  const { sendMessage, isLoading: isChatLoading } = useChat();
+
+  const bgColor = useColorModeValue("gray.50", "gray.700");
+  const messageBgUser = useColorModeValue("blue.100", "blue.700");
+  const messageBgAssistant = useColorModeValue("gray.100", "gray.600");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    scrollToBottom();
+  }, [messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || !sensorData) return
+    if (!input.trim() || !sensorData) return;
 
     const userMessage: Message = {
       role: "user",
       content: input,
-    }
+    };
 
-    setMessages(prev => [...prev, userMessage])
-    setInput("")
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
 
     // Add loading message
     const loadingMessage: Message = {
       role: "assistant",
       content: "",
-      isLoading: true
-    }
-    setMessages(prev => [...prev, loadingMessage])
+      isLoading: true,
+    };
+    setMessages((prev) => [...prev, loadingMessage]);
 
     try {
       const response = await sendMessage(input, {
         temperature: Number(sensorData.temperature.current?.value ?? 0),
         humidity: Number(sensorData.humidity.current?.value ?? 0),
         toxicGases: Number(sensorData.toxicGases.current?.value ?? 0),
-      })
+      });
       // Remove loading message and add actual response
-      setMessages(prev => {
-        const withoutLoading = prev.filter(msg => !msg.isLoading)
-        return [...withoutLoading, {
-          role: "assistant",
-          content: response,
-        }]
-      })
+      setMessages((prev) => {
+        const withoutLoading = prev.filter((msg) => !msg.isLoading);
+        return [
+          ...withoutLoading,
+          {
+            role: "assistant",
+            content: response,
+          },
+        ];
+      });
     } catch (error) {
       // Remove loading message on error
-      setMessages(prev => prev.filter(msg => !msg.isLoading))
-      console.error("Error sending message:", error)
+      setMessages((prev) => prev.filter((msg) => !msg.isLoading));
+      console.error("Error sending message:", error);
     }
-  }
+  };
 
   if (isSensorDataLoading) {
     return (
-      <Container maxW="container.lg" py={8}>
+      <Container maxW="container.lg" py={8} mt={10}>
         <VStack spacing={4} h="80vh">
           <Heading size="lg" alignSelf="flex-start" mb={4}>
             Assistente Virtual
@@ -110,12 +122,12 @@ export function ChatInterface() {
           </Flex>
         </VStack>
       </Container>
-    )
+    );
   }
 
   if (sensorError) {
     return (
-      <Container maxW="container.lg" py={8}>
+      <Container maxW="container.lg" py={8} mt={10}>
         <VStack spacing={4} h="80vh">
           <Heading size="lg" alignSelf="flex-start" mb={4}>
             Assistente Virtual
@@ -125,11 +137,11 @@ export function ChatInterface() {
           </Flex>
         </VStack>
       </Container>
-    )
+    );
   }
 
   return (
-    <Container maxW="container.lg" py={8}>
+    <Container maxW="container.lg" py={8} mt={10}>
       <VStack spacing={4} h="80vh">
         <Heading size="lg" alignSelf="flex-start" mb={4}>
           Assistente Virtual
@@ -140,19 +152,19 @@ export function ChatInterface() {
             title="Temperatura Atual"
             value={`${sensorData?.temperature.current?.value || 0}°C`}
             icon={FiThermometer}
-            helpText={`Última atualização: ${new Date(sensorData?.temperature.current?.read_at || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.temperature.current?.read_at || "").toLocaleTimeString()}`}
           />
           <StatCard
             title="Umidade Atual do Ar"
             value={`${sensorData?.humidity.current?.value || 0}%`}
             icon={FiDroplet}
-            helpText={`Última atualização: ${new Date(sensorData?.humidity.current?.read_at || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.humidity.current?.read_at || "").toLocaleTimeString()}`}
           />
           <StatCard
             title="Nível Atual de Gases Tóxicos"
             value={`${sensorData?.toxicGases.current?.value || 0} ppm`}
             icon={FiAlertTriangle}
-            helpText={`Última atualização: ${new Date(sensorData?.toxicGases.current?.read_at || '').toLocaleTimeString()}`}
+            helpText={`Última atualização: ${new Date(sensorData?.toxicGases.current?.read_at || "").toLocaleTimeString()}`}
           />
         </SimpleGrid>
 
@@ -178,7 +190,8 @@ export function ChatInterface() {
               <Icon as={FaRobot} fontSize="4xl" mb={4} />
               <Text>Inicie uma conversa com o Assistente Virtual</Text>
               <Text fontSize="sm">
-                Faça perguntas sobre os dados ambientais e obtenha insights em tempo real
+                Faça perguntas sobre os dados ambientais e obtenha insights em
+                tempo real
               </Text>
             </Flex>
           ) : (
@@ -200,7 +213,9 @@ export function ChatInterface() {
                 )}
                 <Box
                   maxW="70%"
-                  bg={message.role === "user" ? messageBgUser : messageBgAssistant}
+                  bg={
+                    message.role === "user" ? messageBgUser : messageBgAssistant
+                  }
                   p={4}
                   borderRadius="lg"
                   boxShadow="sm"
@@ -233,7 +248,7 @@ export function ChatInterface() {
           )}
           <div ref={messagesEndRef} />
         </Box>
-        
+
         <InputGroup size="lg">
           <Input
             value={input}
@@ -265,5 +280,5 @@ export function ChatInterface() {
         </InputGroup>
       </VStack>
     </Container>
-  )
-} 
+  );
+}

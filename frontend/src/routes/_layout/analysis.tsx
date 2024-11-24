@@ -62,7 +62,7 @@ function Analysis() {
 
   if (isSensorDataLoading || isAnalysisLoading) {
     return (
-      <Container maxW="container.xl" py={8}>
+      <Container maxW="container.xl" py={8} mt={10}>
         <VStack spacing={8} align="stretch">
           <Button
             leftIcon={<Icon as={FiRefreshCw} />}
@@ -84,7 +84,7 @@ function Analysis() {
   const suggestions = JSON.parse(analysisData?.suggestions || "[]");
 
   return (
-    <Container maxW="container.xl" py={8}>
+    <Container maxW="container.xl" py={8} mt={10}>
       <VStack spacing={8} align="stretch">
         <Button
           leftIcon={<Icon as={FiRefreshCw} />}
